@@ -1,0 +1,240 @@
+{% extends 'posts/base.html' %}  {# 繼承 base 樣板 #}
+{% load static %}                {# 載入 static 標籤 #}
+
+{% block content %}
+<style>
+  /* 外框樣式 */
+  .frame {
+    position: relative;
+    margin: 20px auto;
+    padding: 15px;
+    max-width: 1000px;
+    border: 2px solid #999;
+    border-radius: 8px;
+    background: #f9f9f9;
+  }
+
+  /* 主內容容器：左右分欄 */
+  .container {
+    display: flex;
+  }
+
+  /* 側邊欄樣式 */
+  .sidebar {
+    width: 200px;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+  }
+
+  /* 側邊欄標題樣式 */
+  .sidebar .category-title {
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  /* 側邊欄連結樣式 */
+  .sidebar .category-list a {
+    display: block;
+    padding: 3px 6px;
+    margin: 2px 0;
+    text-decoration: none;
+    color: #333;
+    border-radius: 4px;
+  }
+
+  /* 滑過側邊連結變色 */
+  .sidebar .category-list a:hover {
+    color: blue;
+  }
+
+  /* 當前選取樣式 */
+  .sidebar .category-list a.active {
+    background-color: #ddd;
+    font-weight: bold;
+  }
+
+  /* 主內容區塊樣式 */
+  .main-content {
+    flex: 1;
+    padding: 10px;
+  }
+
+  /* 貼文排列容器（縱向） */
+  .post-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* 單張貼文卡片樣式 */
+  .post-card {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 15px;
+    background: #fff;
+    gap: 20px;
+  }
+
+  /* 貼文圖片樣式 */
+  .post-card img {
+    width: 180px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  /* 貼文文字區塊 */
+  .post-card .text {
+    flex: 1;
+  }
+
+  /* 浮動新增貼文按鈕 */
+  .fab {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #007bff;
+    color: #fff;
+    font-size: 2rem;
+    line-height: 50px;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  /* 浮動按鈕 hover 效果 */
+  .fab:hover {
+    background: #0056b3;
+  }
+
+  /* 內文貼文區捲動區塊 */
+  .post-preview-list {
+    height: 500px;
+    overflow-y: auto;
+    padding-right: 10px; 
+    box-sizing: border-box;
+  }
+</style>
+
+<!-- 主畫面結構 -->
+<div class="frame">
+  <div class="container">
+
+    <!-- 側邊欄：城市與類型分類 -->
+    <div class="sidebar">
+
+      <!-- 城市選單 -->
+      <div class="category-title">地點</div>
+      <div class="category-list">
+        {% for location in locations %}
+          {% if location.name in "Sydney Melbourne Brisbane Perth" %}
+            <a href="{% url 'post_list' %}?location={{ location.name }}"
+              class="{% if location.name == selected_location %}active{% endif %}">
+              {{ location.name }}
+            </a>
+          {% endif %}
+        {% endfor %}
+
+        <!-- 更多城市 -->
+        <div id="more-locations" style="display: none;">
+          {% for location in locations %}
+            {% if location.name not in "Sydney Melbourne Brisbane Perth" %}
+              <a href="{% url 'post_list' %}?location={{ location.name }}"
+                class="{% if location.name == selected_location %}active{% endif %}">
+                {{ location.name }}
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- 城市展開按鈕 -->
+        <button id="toggle-more" class="btn btn-sm btn-outline-secondary mt-2">更多城市 ▼</button>
+      </div>
+
+      <!-- 類型選單 -->
+      <div class="category-title">景點類型</div>
+      <div class="category-list">
+        {% for category in categories %}
+          {% if category.name in "Beaches Museums Parks Historical" %}
+            <a href="{% url 'filter_by_category' category.id %}{% if selected_location %}?location={{ selected_location }}{% endif %}"
+               class="{% if current_category == category.name %}active{% endif %}">
+              {{ category.name }}
+            </a>
+          {% endif %}
+        {% endfor %}
+
+        <!-- 更多類型 -->
+        <div id="more-categories" style="display: none;">
+          {% for category in categories %}
+            {% if category.name not in "Beaches Museums Parks Historical" %}
+              <a href="{% url 'filter_by_category' category.id %}{% if selected_location %}?location={{ selected_location }}{% endif %}"
+                 class="{% if current_category == category.name %}active{% endif %}">
+                {{ category.name }}
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- 類型展開按鈕 -->
+        <button id="toggle-more-categories" class="btn btn-sm btn-outline-secondary mt-2">更多類型 ▼</button>
+      </div>
+    </div>
+
+    <!-- 主內容：貼文列表 -->
+    <div class="main-content">
+      <div class="header">
+        <h2>所有貼文</h2>
+      </div>
+      <div class="post-preview-list">
+        <div class="post-grid">
+          {% for post in posts %}
+          <div class="post-card">
+            {% if post.photos.first %}
+              <img src="{{ post.photos.first.image.url }}" alt="Post Photo">
+            {% endif %}
+            <div class="text">
+              <h4><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h4>
+              <p><strong>{{ post.author }}</strong> - {{ post.created_at|date:"Y年n月j日 H:i" }}</p>
+              <p>{{ post.content|truncatechars:60 }}</p>
+            </div>
+          </div>        
+          {% empty %}
+            <p>目前尚無貼文。</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 浮動新增貼文按鈕 -->
+  <a href="{% url 'create_post' %}" class="fab">＋</a>
+</div>
+
+<!-- 展開城市／類型的 JS 控制 -->
+<script>
+  const toggleBtn = document.getElementById('toggle-more');
+  const moreBlock = document.getElementById('more-locations');
+  let expanded = false;
+
+  toggleBtn.addEventListener('click', () => {
+    expanded = !expanded;
+    moreBlock.style.display = expanded ? 'block' : 'none';
+    toggleBtn.textContent = expanded ? '收起 ▲' : '更多城市 ▼';
+  });
+
+  const toggleCatBtn = document.getElementById('toggle-more-categories');
+  const moreCatBlock = document.getElementById('more-categories');
+  let catExpanded = false;
+
+  toggleCatBtn.addEventListener('click', () => {
+    catExpanded = !catExpanded;
+    moreCatBlock.style.display = catExpanded ? 'block' : 'none';
+    toggleCatBtn.textContent = catExpanded ? '收起 ▲' : '更多類型 ▼';
+  });
+</script>
+{% endblock %}

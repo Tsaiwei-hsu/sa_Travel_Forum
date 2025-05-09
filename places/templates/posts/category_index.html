@@ -1,0 +1,104 @@
+{% extends 'posts/base.html' %}                {# 繼承 base.html 樣板 #}
+{% load custom_filters %}                      {# 載入自訂過濾器，用於 get_item #}
+{% block title %}選擇州{% endblock %}           {# 設定頁面標題 #}
+
+{% block content %}
+<style>
+  /* 外層選擇框樣式 */
+  .location-box {
+    position: relative; 
+    background-color: #aaaaaa;  
+    border-radius: 2rem;        
+    padding: 2rem;              
+    color: white;              
+    max-width: 500px;           
+    margin: 3rem auto;          
+    }
+
+  /* 標題樣式 */
+  .location-box h2 {
+    text-align: center;        
+    font-size: 1.4rem;         
+    font-weight: bold;          
+    letter-spacing: 1px;       
+    margin-bottom: 2rem;        
+  }
+
+  /* 移除 ul 預設樣式 */
+  .location-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* 州名連結樣式 */
+  .state-link a {
+    color: white;                         
+    text-decoration: none;               
+    transition: color 0.2s, background-color 0.2s; 
+    padding: 4px 8px;                     
+    display: inline-block;              
+    border-radius: 4px;                  
+  }
+
+  /* 滑過州名連結時變色 */
+  .state-link a:hover {
+    background-color: #777;             
+    color: #dfdccc;                     
+  }
+
+  /* 城市預覽框樣式（預設隱藏） */
+  .preview-box {
+    display: none;                       
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translate(-105%, -50%);   
+    background-color: #fefefe;          
+    color: #333;                        
+    border: 1px solid #ccc;             
+    padding: 10px 12px;                
+    border-radius: 8px;                 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); 
+    min-width: 180px;                   
+    z-index: 100;                        
+    font-size: 0.95rem;                 
+  }
+
+  /* 滑過州名時顯示預覽城市框 */
+  .state-link:hover .preview-box {
+    display: block;
+  }
+
+  /* 預覽框內部 ul 樣式 */
+  .preview-box ul {
+    padding-left: 20px;
+    margin: 0;
+  }
+</style>
+
+<!-- 州選擇區塊 -->
+<div class="location-box">
+  <h2>選擇州</h2>
+  <ul>
+    {% for state in states %}  
+      <li class="state-link">
+        <a href="{% url 'filter_by_state' state.id %}">{{ state.name }}</a>  
+        
+        {% with location_cities|get_item:state.name as cities %}  
+          {% if cities %}
+            <div class="preview-box">
+              <strong>城市：</strong>
+              <ul>
+                {% for city in cities %}
+                  <li>{{ city }}</li> 
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {% endwith %}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

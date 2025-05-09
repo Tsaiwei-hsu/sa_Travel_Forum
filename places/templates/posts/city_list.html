@@ -1,0 +1,15 @@
+{% extends 'posts/base.html' %}
+{% block title %}選擇城市{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>州：{{ state.name }}</h2>
+  <ul class="list-group mt-3">
+    {% for city in cities %}
+      <li class="list-group-item">
+        <a href="{% url 'post_list' %}?location={{ city.name }}">{{ city.name }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

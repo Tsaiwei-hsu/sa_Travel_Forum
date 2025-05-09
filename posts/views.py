@@ -1,0 +1,227 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+from django.contrib.auth.views import LogoutView
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+from django.urls import reverse
+from django.http import HttpResponseRedirect
+from django.contrib import messages
+from django import forms
+import os
+
+from .forms import (
+    CustomUserCreationForm, CommentForm, PostForm, PhotoForm, UserProfileForm
+)
+from .models import Post, Location, Category, Photo, UserProfile
+
+
+# 首頁（地圖）
+def map_home(request):
+    if request.user.is_authenticated:
+        UserProfile.objects.get_or_create(user=request.user)
+    return render(request, 'posts/home.html')
+
+
+# 註冊頁面（使用者建立帳號）
+def signup(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.email = form.cleaned_data['email']
+            user.save()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
+
+# 個人檔案設定（可修改資料與頭貼）
+@login_required
+def profile(request):
+    user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        user_form = ProfileForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, "個人資料已更新！")
+            return redirect('profile')
+        else:
+            messages.error(request, "欄位錯誤，請再次檢查。")
+    else:
+        user_form = ProfileForm(instance=request.user)
+        profile_form = UserProfileForm(instance=user_profile)
+
+    my_posts = request.user.post_set.all().order_by('-created_at')
+    return render(request, 'posts/profile.html', {
+        'form': user_form,
+        'profile_form': profile_form,
+        'my_posts': my_posts,
+    })
+
+
+# 上傳頭像頁
+def upload_avatar(request):
+    if request.method == 'POST' and request.FILES.get('avatar'):
+        avatar = request.FILES['avatar']
+        fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'avatars'))
+        filename = fs.save(avatar.name, avatar)
+        return redirect('show_avatar', filename=filename)
+    return render(request, 'upload_avatar.html')
+
+
+# 顯示頭像（供預覽）
+def show_avatar(request, filename):
+    avatar_url = f"{settings.MEDIA_URL}avatars/{filename}"
+    return render(request, 'show_avatar.html', {'avatar_url': avatar_url})
+
+
+# 建立貼文（含多圖）
+@login_required
+def create_post(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            for img in request.FILES.getlist('images'):
+                Photo.objects.create(post=post, image=img)
+            return redirect('post_list')
+        else:
+            print("表單錯誤：", form.errors)
+    else:
+        form = PostForm()
+
+    return render(request, 'posts/create_post.html', {
+        'form': form,
+        'locations': Location.objects.all(),
+        'categories': Category.objects.all(),
+        'user': request.user
+    })
+
+
+# 編輯貼文（可上傳新圖片）
+@login_required
+def edit_post(request, pk):
+    post = get_object_or_404(Post, pk=pk, author=request.user)
+
+    if request.method == 'POST':
+        post_form = PostForm(request.POST, instance=post)
+        if post_form.is_valid():
+            post = post_form.save()
+            images = request.FILES.getlist('images')
+            if images:
+                post.photos.all().delete()
+                for img in images:
+                    Photo.objects.create(post=post, image=img)
+            messages.success(request, "貼文更新成功！")
+            return redirect('post_detail', pk=post.pk)
+        else:
+            print("表單驗證錯誤：", post_form.errors)
+            messages.error(request, "表單有誤，請檢查每個欄位。")
+    else:
+        post_form = PostForm(instance=post)
+
+    return render(request, 'posts/edit_post.html', {
+        'form': post_form,
+        'photo_form': PhotoForm(),
+        'locations': Location.objects.all(),
+        'categories': Category.objects.all(),
+        'user': request.user,
+        'post': post,
+    })
+
+
+# 刪除貼文
+@login_required
+def delete_post(request, pk):
+    post = get_object_or_404(Post, pk=pk, author=request.user)
+    if request.method == 'POST':
+        post.delete()
+        return redirect('profile')
+
+
+# 單篇貼文詳情（含留言）
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    comments = post.comments.all()
+
+    if request.user.is_authenticated:
+        UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = CommentForm()
+
+    return render(request, 'posts/post_detail.html', {
+        'post': post,
+        'comments': comments,
+        'form': form,
+    })
+
+
+# 貼文總清單（可過濾地點）
+def post_list(request):
+    location_name = request.GET.get('location')
+    if location_name:
+        location = get_object_or_404(Location, name=location_name)
+        posts = Post.objects.filter(location=location).order_by('-created_at')
+    else:
+        posts = Post.objects.all().order_by('-created_at')
+
+    return render(request, 'posts/post_list.html', {
+        'posts': posts,
+        'locations': Location.objects.all(),
+        'categories': Category.objects.all(),
+        'selected_location': location_name,
+        'current_category': None
+    })
+
+
+# 根據城市過濾貼文（左側城市選單點擊）
+def filter_by_location(request, location_name):
+    return HttpResponseRedirect(f"{reverse('post_list')}?location={location_name}")
+
+
+# 根據分類過濾貼文（左側分類選單點擊）
+def filter_by_category(request, category_id):
+    category = get_object_or_404(Category, pk=category_id)
+    location_name = request.GET.get('location')
+
+    if location_name:
+        location = get_object_or_404(Location, name=location_name)
+        posts = Post.objects.filter(category=category, location=location).order_by('-created_at')
+    else:
+        location = None
+        posts = Post.objects.filter(category=category).order_by('-created_at')
+
+    return render(request, 'posts/post_list.html', {
+        'posts': posts,
+        'locations': Location.objects.all(),
+        'categories': Category.objects.all(),
+        'selected_location': location_name,
+        'current_category': category.name,
+        'current_city': location.name if location else None
+    })
+
+
+# 使用者基本資料表單（用於 profile）
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
