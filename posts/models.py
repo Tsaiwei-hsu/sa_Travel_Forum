@@ -20,9 +20,9 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)  
     title = models.CharField(max_length=200)                    
     content = models.TextField()                               
-    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=False)  
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=False)  
-    address = models.CharField(max_length=255, blank=False)     
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)  
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)  
+    address = models.CharField(max_length=255, blank=True)     
     created_at = models.DateTimeField(auto_now_add=True)        
 
     def __str__(self):
