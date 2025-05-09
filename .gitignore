@@ -6,9 +6,6 @@ __pycache__/
 # SQLite 資料庫
 *.sqlite3
 
-# 媒體上傳資料
-media/
-
 # 虛擬環境
 venv/
 
