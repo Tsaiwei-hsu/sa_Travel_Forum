@@ -6,15 +6,15 @@ from django.contrib.auth.views import LogoutView
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django import forms
 import os
 
+from .models import Favorite, Post, Location, Category, Photo, UserProfile
 from .forms import (
     CustomUserCreationForm, CommentForm, PostForm, PhotoForm, UserProfileForm
 )
-from .models import Post, Location, Category, Photo, UserProfile
 
 
 # 首頁（地圖）
@@ -60,10 +60,13 @@ def profile(request):
         profile_form = UserProfileForm(instance=user_profile)
 
     my_posts = request.user.post_set.all().order_by('-created_at')
+    my_favorites = Favorite.objects.filter(user=request.user).select_related('post')
+
     return render(request, 'posts/profile.html', {
         'form': user_form,
         'profile_form': profile_form,
         'my_posts': my_posts,
+        'favorites': my_favorites,
     })
 
 
@@ -149,13 +152,15 @@ def delete_post(request, pk):
         return redirect('profile')
 
 
-# 單篇貼文詳情（含留言）
+# 單篇貼文詳情（含留言與收藏）
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     comments = post.comments.all()
 
+    user_favorites = []
     if request.user.is_authenticated:
         UserProfile.objects.get_or_create(user=request.user)
+        user_favorites = Favorite.objects.filter(user=request.user).values_list('post_id', flat=True)
 
     if request.method == 'POST':
         form = CommentForm(request.POST)
@@ -172,10 +177,11 @@ def post_detail(request, pk):
         'post': post,
         'comments': comments,
         'form': form,
+        'user_favorites': user_favorites,
     })
 
 
-# 貼文總清單（可過濾地點）
+# 貼文總清單（可過濾地點與顯示收藏）
 def post_list(request):
     location_name = request.GET.get('location')
     if location_name:
@@ -184,12 +190,17 @@ def post_list(request):
     else:
         posts = Post.objects.all().order_by('-created_at')
 
+    user_favorites = []
+    if request.user.is_authenticated:
+        user_favorites = Favorite.objects.filter(user=request.user).values_list('post_id', flat=True)
+
     return render(request, 'posts/post_list.html', {
         'posts': posts,
         'locations': Location.objects.all(),
         'categories': Category.objects.all(),
         'selected_location': location_name,
-        'current_category': None
+        'current_category': None,
+        'user_favorites': user_favorites,
     })
 
 
@@ -210,13 +221,18 @@ def filter_by_category(request, category_id):
         location = None
         posts = Post.objects.filter(category=category).order_by('-created_at')
 
+    user_favorites = []
+    if request.user.is_authenticated:
+        user_favorites = Favorite.objects.filter(user=request.user).values_list('post_id', flat=True)
+
     return render(request, 'posts/post_list.html', {
         'posts': posts,
         'locations': Location.objects.all(),
         'categories': Category.objects.all(),
         'selected_location': location_name,
         'current_category': category.name,
-        'current_city': location.name if location else None
+        'current_city': location.name if location else None,
+        'user_favorites': user_favorites,
     })
 
 
@@ -225,3 +241,14 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email']
+
+
+# 收藏功能切換（AJAX）
+@login_required
+def toggle_favorite(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, post=post)
+    if not created:
+        favorite.delete()
+        return JsonResponse({'status': 'unfavorited'})
+    return JsonResponse({'status': 'favorited'})

@@ -14,6 +14,8 @@ urlpatterns = [
     path('create/', views.create_post, name='create_post'),          # 建立貼文
     path('edit/<int:pk>/', views.edit_post, name='edit_post'),       # 編輯貼文
     path('delete/<int:pk>/', views.delete_post, name='delete_post'), # 刪除貼文
+    path('favorite/<int:post_id>/', views.toggle_favorite, name='toggle_favorite'), # 收藏貼文
+    path('profile/', views.profile, name='profile'),
 
     # 使用者帳號功能
     path('signup/', views.signup, name='signup'),                          # 註冊

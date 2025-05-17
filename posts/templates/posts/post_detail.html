@@ -105,6 +105,15 @@
   .submit-btn:hover {
     background-color: #81919f;
   }
+
+  .favorite-icon {
+    color: gray;
+    font-size: 24px;
+    cursor: pointer;
+}
+.favorite-icon.favorited {
+    color: gold;
+}
 </style>
 
 <!-- 貼文主區塊 -->
@@ -142,6 +151,11 @@
     <!-- 發佈時間 -->
     <p>{{ post.created_at|date:"Y年n月j日 H:i" }}</p>
   </div>
+  <!-- 在 post_list.html 或 post_detail.html 中 -->
+  <button class="favorite-btn" data-post-id="{{ post.id }}">
+    <span class="favorite-icon {% if post.id in user_favorites %}favorited{% endif %}">★</span>
+  </button>
+
 
   <!-- 留言列表 -->
   <div class="comments">
@@ -169,4 +183,28 @@
     <p><a href="{% url 'login' %}?next={{ request.path }}">請先登入以留言</a></p>
   {% endif %}
 </div>
+
+<script>
+  document.querySelectorAll('.favorite-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const postId = button.dataset.postId;
+      fetch(`/favorite/${postId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        const icon = button.querySelector('.favorite-icon');
+        if (data.status === 'favorited') {
+          icon.classList.add('favorited');
+        } else {
+          icon.classList.remove('favorited');
+        }
+      });
+    });
+  });
+</script>
+
 {% endblock %}

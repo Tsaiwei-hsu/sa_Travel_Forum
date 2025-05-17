@@ -3,7 +3,6 @@
 
 {% block content %}
 <style>
-  /* 個人資料主容器樣式 */
   .profile-container {
     max-width: 800px;
     margin: 30px auto;
@@ -13,14 +12,12 @@
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   }
 
-  /* 標題樣式 */
   .profile-header {
     font-size: 1.4rem;
     font-weight: bold;
     margin-bottom: 20px;
   }
 
-  /* 所有表單欄位加黑框 */
   input[type="text"],
   input[type="email"],
   input[type="file"],
@@ -33,7 +30,6 @@
     border: 1px solid black;
   }
 
-  /* 儲存按鈕樣式 */
   .submit-btn {
     background-color: #333;
     color: white;
@@ -43,7 +39,6 @@
     cursor: pointer;
   }
 
-  /* 發文清單區塊 */
   .my-posts {
     margin-top: 40px;
   }
@@ -52,21 +47,35 @@
     margin-bottom: 16px;
   }
 
-  /* 每篇貼文的樣式 */
   .post-item {
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     background: #fafafa;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  }
+
+  .post-item img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
   }
 
   .post-item h4 {
     margin: 0 0 8px 0;
+    font-size: 18px;
   }
 
-  /* 貼文操作連結與按鈕樣式 */
-  .post-item a, .post-item form button {
+  .post-item p {
+    color: #555;
+    margin-bottom: 10px;
+  }
+
+  .post-item a,
+  .post-item form button {
     color: #007bff;
     text-decoration: none;
     margin-right: 10px;
@@ -75,35 +84,52 @@
     padding: 0;
     font: inherit;
     cursor: pointer;
+    font-size: 14px;
   }
 
-  /* 更改密碼連結區塊 */
+  .post-item a.button-link {
+    background-color: #81919f;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+  }
+
   .change-password {
     margin-top: 30px;
   }
+
+  .toggle-section {
+    display: none;
+  }
+
+  .tab-button {
+    background-color: #eee;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-right: 10px;
+    border-radius: 8px;
+  }
+
+  .tab-button.active {
+    background-color: #81919f;
+    color: white;
+  }
 </style>
 
-<!-- 使用者個人資料主容器 -->
 <div class="profile-container">
-
-  <!-- 標題 -->
   <div class="profile-header">我的帳號資料</div>
 
-  <!-- 使用者基本資料編輯表單 -->
   <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-
     <div class="form-group">
       <label for="id_username">使用者名稱：</label>
       {{ form.username }}
     </div>
-
     <div class="form-group">
       <label for="id_email">電子郵件：</label>
       {{ form.email }}
     </div>
-
-    <!-- 頭像上傳與預覽 -->
     <div class="form-group">
       <label for="id_avatar">頭貼：</label><br>
       {% if request.user.userprofile.avatar %}
@@ -113,27 +139,28 @@
       {% endif %}
       {{ profile_form.avatar }}
     </div>
-
-    <!-- 儲存按鈕 -->
     <button type="submit" class="submit-btn">儲存修改</button>
   </form>
 
-  <!-- 更改密碼連結 -->
   <div class="change-password">
     <a href="{% url 'password_change' %}">更改密碼</a>
   </div>
 
-  <!-- 使用者發表過的貼文列表 -->
-  <div class="my-posts">
-    <h3>我發表的貼文</h3>
+  <div style="margin-top: 40px;">
+    <button class="tab-button active" onclick="showSection('posts')">我發表的貼文</button>
+    <button class="tab-button" onclick="showSection('favorites')">我收藏的貼文</button>
+  </div>
+
+  <div id="posts" class="my-posts toggle-section" style="display: block;">
     {% for post in my_posts %}
       <div class="post-item">
+        {% if post.photos.all %}
+          <img src="{{ post.photos.all.0.image.url }}" alt="封面圖">
+        {% endif %}
         <h4>{{ post.title }}</h4>
         <p>{{ post.content|truncatewords:20 }}</p>
         <a href="{% url 'post_detail' post.pk %}">查看</a>
         <a href="{% url 'edit_post' post.pk %}">編輯</a>
-
-        <!-- 刪除貼文表單（搭配確認提示） -->
         <form action="{% url 'delete_post' post.pk %}" method="post" style="display:inline">
           {% csrf_token %}
           <button type="submit" onclick="return confirm('你確定要刪除這則貼文嗎？');">刪除</button>
@@ -143,5 +170,29 @@
       <p>你尚未發表任何貼文。</p>
     {% endfor %}
   </div>
+
+  <div id="favorites" class="my-posts toggle-section">
+    {% for fav in favorites %}
+      <div class="post-item">
+        {% if fav.post.photos.all %}
+          <img src="{{ fav.post.photos.all.0.image.url }}" alt="封面圖">
+        {% endif %}
+        <h4>{{ fav.post.title }}</h4>
+        <p>{{ fav.post.content|truncatewords:20 }}</p>
+        <a href="{% url 'post_detail' fav.post.id %}" class="button-link">查看貼文</a>
+      </div>
+    {% empty %}
+      <p>你尚未收藏任何貼文。</p>
+    {% endfor %}
+  </div>
 </div>
+
+<script>
+  function showSection(sectionId) {
+    document.querySelectorAll('.toggle-section').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(sectionId).style.display = 'block';
+    event.target.classList.add('active');
+  }
+</script>
 {% endblock %}
