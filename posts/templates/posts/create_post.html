@@ -129,13 +129,11 @@
     }
 
     /* 錯誤訊息樣式 */
-    .errorlist {
-      color: red;
-      font-size: 14px;
-      margin: 5px 0;
-      list-style: none;
-      padding: 0;
+    .error-field {
+      border: 2px solid red !important;
+      background-color: #fff8f8;
     }
+
   </style>
 </head>
 <body>
@@ -160,29 +158,50 @@
       {% csrf_token %}
 
       <!-- 標題欄位 -->
-      <input type="text" name="title" class="input-box" placeholder="標題" value="{{ form.title.value|default_if_none:"" }}">
+      <input type="text" name="title"
+          class="input-box {% if form.title.errors %}error-field{% endif %}"
+          placeholder="標題"
+          value="{{ form.title.value|default_if_none:'' }}">
+      {{ form.title.errors }}
 
       <!-- 貼文內容欄位 -->
-      <textarea name="content" class="input-box" placeholder="分享你的旅遊心得...">{{ form.content.value|default_if_none:"" }}</textarea>
+      <textarea name="content"
+          class="input-box {% if form.content.errors %}error-field{% endif %}"
+          placeholder="分享你的旅遊心得...">{{ form.content.value|default_if_none:'' }}</textarea>
+      {{ form.content.errors }}
 
       <!-- 地點下拉選單 -->
-      <select name="location" class="input-box">
-        <option value="">選擇地點</option>
-        {% for loc in locations %}
-          <option value="{{ loc.id }}" {% if form.location.value|stringformat:"s" == loc.id|stringformat:"s" %}selected{% endif %}>{{ loc.name }}</option>
-        {% endfor %}
+      <select name="location"
+          class="input-box {% if form.location.errors %}error-field{% endif %}">
+      <option value="">選擇地點</option>
+      {% for loc in locations %}
+        <option value="{{ loc.id }}"
+          {% if form.location.value|stringformat:"s" == loc.id|stringformat:"s" %}selected{% endif %}>
+          {{ loc.name }}
+        </option>
+      {% endfor %}
       </select>
+      {{ form.location.errors }}
 
       <!-- 分類下拉選單 -->
-      <select name="category" class="input-box">
-        <option value="">選擇分類</option>
-        {% for cat in categories %}
-          <option value="{{ cat.id }}" {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
-        {% endfor %}
+      <select name="category"
+          class="input-box {% if form.category.errors %}error-field{% endif %}">
+      <option value="">選擇分類</option>
+      {% for cat in categories %}
+        <option value="{{ cat.id }}"
+          {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>
+          {{ cat.name }}
+        </option>
+      {% endfor %}
       </select>
+      {{ form.category.errors }}
 
       <!-- 地址欄位 -->
-      <input type="text" name="address" class="input-box" placeholder="地址" value="{{ form.address.value|default_if_none:"" }}">
+      <input type="text" name="address"
+          class="input-box {% if form.address.errors %}error-field{% endif %}"
+          placeholder="地址"
+          value="{{ form.address.value|default_if_none:'' }}">
+      {{ form.address.errors }}
 
       <!-- 圖片上傳欄位 -->
       <div class="file-upload">
@@ -192,6 +211,7 @@
 
       <!-- 圖片預覽框 -->
       <div class="preview" id="previewBox"></div>
+
 
       <!-- 提交按鈕 -->
       <button type="submit" class="submit-btn">Post</button>
