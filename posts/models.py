@@ -59,3 +59,12 @@ class Favorite(models.Model):
 
     class Meta:
         unique_together = ('user', 'post')  # 防止重複收藏
+
+# 使用者喜好
+class UserPreference(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    favorite_categories = models.ManyToManyField(Category, blank=True)  # 使用者喜好的分類
+    favorite_locations = models.ManyToManyField(Location, blank=True)  # 使用者喜好的地點
+
+    def __str__(self):
+        return f"{self.user.username}的喜好"
