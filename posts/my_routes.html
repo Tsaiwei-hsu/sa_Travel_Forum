@@ -1,0 +1,19 @@
+<!-- 我的路线主页面，显示所有路线及其景点 -->
+<h2>我的路线</h2>
+<a href="{% url 'create_route' %}">新增路线</a>
+<ul>
+  {% for route in routes %}
+    <li>
+      {{ route.name }} 
+      <a href="{% url 'add_place_to_route' route.id %}">添加景点</a>
+      <a href="{% url 'edit_route' route.id %}">编辑</a>
+      <a href="{% url 'delete_route' route.id %}">删除</a>
+      <a href="{% url 'edit_route_items' route.id %}">调整顺序</a>
+      <ul>
+        {% for item in route.items.all %}
+          <li>{{ item.place.title }}</li> <!-- 显示景点标题 -->
+        {% endfor %}
+      </ul>
+    </li>
+  {% endfor %}
+</ul>

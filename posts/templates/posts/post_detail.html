@@ -1,0 +1,217 @@
+{% extends 'posts/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  /* 貼文容器樣式 */
+  .post-container {
+    width: 500px;
+    height: 500px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    color: #000;
+  }
+
+  /* 地址欄位樣式 */
+  .address {
+    color: #000000;
+    font-size: 14px;
+    margin-top: 5px;
+    word-wrap: break-word;
+  }
+
+  /* 頭像與使用者資訊區塊 */
+  .post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+  }
+
+  /* 使用者頭像樣式 */
+  .avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  /* 使用者名稱與提示文字 */
+  .post-user-info {
+    font-size: 16px;
+    color: #333;
+  }
+
+  /* 貼文內容區塊 */
+  .post-detail h2 {
+    margin: 10px 0 5px;
+    font-size: 24px;
+  }
+
+  .post-detail p {
+    margin: 6px 0;
+    color: #444;
+  }
+
+  /* 貼文圖片區塊 */
+  .post-images {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .post-images img {
+    max-width: 100%;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+  }
+
+  /* 留言區塊 */
+  .comments {
+    margin-top: 30px;
+  }
+
+  .comments .comment {
+    border-bottom: 1px dashed #ccc;
+    padding: 8px 0;
+  }
+
+  /* 留言表單樣式 */
+  .comment-form textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+
+  /* 留言送出按鈕樣式 */
+  .submit-btn {
+    margin-top: 10px;
+    padding: 10px 16px;
+    background-color: #81919f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .submit-btn:hover {
+    background-color: #81919f;
+  }
+
+  .favorite-icon {
+    color: gray;
+    font-size: 24px;
+    cursor: pointer;
+}
+.favorite-icon.favorited {
+    color: gold;
+}
+</style>
+
+<!-- 貼文主區塊 -->
+<div class="post-container">
+
+  <!-- 使用者頭像與資訊 -->
+  <div class="post-header">
+    {% if post.author.userprofile.avatar %}
+      <img src="{{ post.author.userprofile.avatar.url }}" class="avatar">
+    {% else %}
+      <img src="{% static 'img/default_avatar.png' %}" class="avatar">
+    {% endif %}
+    <div class="post-user-info">
+      <strong>{{ post.author.username }}</strong> &gt; <em>View your post</em>
+    </div>
+  </div>
+
+  <!-- 貼文內容 -->
+  <div class="post-detail">
+    <h2>{{ post.title }}</h2>
+    <p>{{ post.content }}</p>
+    {% if post.address %}
+      <p class="address"><strong>地址：</strong>{{ post.address }}</p>
+    {% endif %}
+    
+    <!-- 貼文圖片 -->
+    {% if post.photos.all %}
+      <div class="post-images">
+        {% for photo in post.photos.all %}
+          <img src="{{ photo.image.url }}" alt="Post Photo">
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- 發佈時間 -->
+    <p>{{ post.created_at|date:"Y年n月j日 H:i" }}</p>
+  </div>
+  <!-- 在 post_list.html 或 post_detail.html 中 -->
+  <button class="favorite-btn" data-post-id="{{ post.id }}">
+    <span class="favorite-icon {% if post.id in user_favorites %}favorited{% endif %}">★</span>
+  </button>
+
+
+  <!-- 留言列表 -->
+  <div class="comments">
+    <h3>留言</h3>
+    {% for comment in comments %}
+      <div class="comment">
+        <p><strong>{{ comment.author.username }}</strong> {{ comment.created_at|date:"Y年n月j日 H:i" }}</p>
+        <p>{{ comment.content }}</p>
+      </div>
+    {% empty %}
+      <p>目前尚無留言。</p>
+    {% endfor %}
+  </div>
+
+  <!-- 留言表單 -->
+  {% if user.is_authenticated %}
+    <div class="comment-form">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="submit-btn">送出留言</button>
+      </form>
+    </div>
+  {% else %}
+    <p><a href="{% url 'login' %}?next={{ request.path }}">請先登入以留言</a></p>
+  {% endif %}
+</div>
+
+<script>
+  document.querySelectorAll('.favorite-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const isAuthenticated = document.body.dataset.authenticated === "True";
+      if (!isAuthenticated) {
+        alert("請先登入才能收藏貼文！");
+        return;
+      }
+
+      const postId = button.dataset.postId;
+      fetch(`/favorite/${postId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        const icon = button.querySelector('.favorite-icon');
+        if (data.status === 'favorited') {
+          icon.classList.add('favorited');
+        } else {
+          icon.classList.remove('favorited');
+        }
+      });
+    });
+  });
+</script>
+
+
+{% endblock %}

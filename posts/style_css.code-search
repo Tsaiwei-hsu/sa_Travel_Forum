@@ -1,0 +1,12 @@
+# Query: style.css
+
+3 個結果 - 3 個檔案
+
+posts/templates/posts/base.html:
+  9:   <link rel="stylesheet" href="{% static 'style.css' %}">
+
+posts/templates/posts/create_post.html:
+  7:   <link rel="stylesheet" href="{% static 'style.css' %}">
+
+posts/templates/posts/edit_post.html:
+  7:   <link rel="stylesheet" href="{% static 'style.css' %}">

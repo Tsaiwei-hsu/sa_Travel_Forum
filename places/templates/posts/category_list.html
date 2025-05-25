@@ -1,0 +1,116 @@
+{% extends 'posts/base.html' %}  {# 繼承 base 樣板 #}
+{% load static %}                {# 載入 static 標籤 #}
+
+{% block content %}
+<style>
+  /* 外層區塊：景點類型選擇框樣式 */
+  .category-container {
+    max-width: 700px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  /* 標題樣式 */
+  .category-container h2 {
+    margin-bottom: 25px;
+    font-size: 24px;
+  }
+
+  /* 類型按鈕樣式 */
+  .category-list a {
+    display: inline-block;
+    margin: 8px 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 30px;
+    text-decoration: none;
+  }
+
+  /* 滑過類型按鈕變色 */
+  .category-list a:hover {
+    background-color: #0056b3;
+  }
+
+  /* 被選中的類型樣式 */
+  .category-list a.active {
+    background-color: #0056b3;
+    font-weight: bold;
+  }
+
+  /* 隱藏的更多類型區塊 */
+  #more-categories {
+    display: none;
+    margin-top: 10px;
+  }
+
+  /* 展開／收起按鈕樣式 */
+  .toggle-btn {
+    margin-top: 10px;
+    padding: 6px 16px;
+    font-size: 14px;
+    color: #007bff;
+    background: none;
+    border: 1px solid #007bff;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+
+  /* 返回地圖按鈕樣式 */
+  .back-btn {
+    display: block;
+    margin-top: 30px;
+    color: #555;
+    font-size: 14px;
+    text-decoration: underline;
+  }
+</style>
+
+<!-- 景點分類主區塊 -->
+<div class="category-container">
+  <h2>請選擇「{{ location.name }}」的景點類型</h2>
+
+  <!-- 顯示熱門類型 -->
+  <div class="category-list">
+    {% for category in categories %}
+      {% if category.name in "Beaches Museums Parks Historical" %}
+        <a href="{% url 'filter_by_category' category.id %}?location={{ location.id }}"
+           class="{% if current_category == category.name %}active{% endif %}">{{ category.name }}</a>
+      {% endif %}
+    {% endfor %}
+
+    <!-- 隱藏的更多類型 -->
+    <div id="more-categories">
+      {% for category in categories %}
+        {% if category.name not in "Beaches Museums Parks Historical" %}
+          <a href="{% url 'filter_by_category' category.id %}?location={{ location.id }}"
+             class="{% if current_category == category.name %}active{% endif %}">{{ category.name }}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- 更多類型按鈕 -->
+    <button id="toggle-more" class="toggle-btn">更多類型 ▼</button>
+  </div>
+
+  <!-- 回首頁按鈕 -->
+  <a href="{% url 'home' %}" class="back-btn">← 回到地圖首頁</a>
+</div>
+
+<!-- 切換展開更多類型的 JavaScript -->
+<script>
+  const toggleBtn = document.getElementById('toggle-more');
+  const moreBlock = document.getElementById('more-categories');
+  let expanded = false;
+
+  toggleBtn.addEventListener('click', () => {
+    expanded = !expanded;
+    moreBlock.style.display = expanded ? 'block' : 'none';
+    toggleBtn.textContent = expanded ? '收起 ▲' : '更多類型 ▼';
+  });
+</script>
+{% endblock %}

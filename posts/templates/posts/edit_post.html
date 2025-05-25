@@ -1,0 +1,260 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Post</title>
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+
+  <!-- 表單頁面專屬樣式 -->
+  <style>
+    /* 頁面與整體排版 */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f2f4f8;
+      padding: 40px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* 表單容器 */
+    .post-container {
+      background: #ffffff;
+      width: 600px;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 使用者頭像與名稱區塊 */
+    .post-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    /* 頭像樣式 */
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 15px;
+      object-fit: cover;
+    }
+
+    /* 使用者資訊樣式 */
+    .post-user-info {
+      font-size: 16px;
+      color: #333;
+    }
+
+    /* 表單內容區塊樣式 */
+    .post-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* 表單欄位（input、select、textarea） */
+    .input-box, select {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* 多行文字欄位 */
+    textarea.input-box {
+      height: 100px;
+      resize: vertical;
+    }
+
+    /* 上傳照片按鈕樣式 */
+    .upload-label {
+      display: inline-block;
+      background: #dfe6f3;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #1f3f6e;
+    }
+
+    /* 隱藏檔案上傳元件 */
+    .file-upload input[type="file"] {
+      display: none;
+    }
+
+    /* 預覽區塊容器 */
+    .preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* 單張預覽圖片樣式 */
+    .preview img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    /* 更新與取消按鈕樣式 */
+    .update-btn,
+    .cancel-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      height: 42px;
+      line-height: 1;
+      min-width: 100px;
+      display: inline-block;
+      text-align: center;
+      text-decoration: none;
+      appearance: none;
+      box-sizing: border-box;
+    }
+
+    /* 更新按鈕顏色 */
+    .update-btn {
+      background-color: #8cabb4;
+      color: white;
+    }
+
+    /* 取消按鈕顏色 */
+    .cancel-btn {
+      background-color: #d1d1d1;
+      color: #000;
+    }
+
+    /* hover 效果 */
+    .update-btn:hover {
+      background-color: #6f95a3;
+    }
+
+    .cancel-btn:hover {
+      background-color: #aaa;
+    }
+
+    /* 錯誤提示文字 */
+    .errorlist {
+      color: red;
+      font-size: 14px;
+      margin: 5px 0;
+      list-style: none;
+      padding: 0;
+    }
+
+    /* 表單整體錯誤框樣式 */
+    .form-errors {
+      background: #ffd2d2;
+      color: #a33;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 編輯貼文主要容器 -->
+  <div class="post-container">
+
+    <!-- 使用者資訊與頭像 -->
+    <div class="post-header">
+      {% if user.is_authenticated and user.userprofile.avatar %}
+        <img src="{{ user.userprofile.avatar.url }}" class="avatar">
+      {% else %}
+        <img src="{% static 'img/default_avatar.png' %}" class="avatar">
+      {% endif %}
+      <div class="post-user-info">
+        <strong>{{ user.username }}</strong> &gt; <em>Edit your post</em>
+      </div>
+    </div>
+
+    <!-- 編輯表單開始 -->
+    <form method="POST" enctype="multipart/form-data" class="post-form">
+      {% csrf_token %}
+
+      <!-- 錯誤顯示 -->
+      {% if form.errors %}
+        <div class="form-errors">
+          請修正以下欄位錯誤：
+          <ul>
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li><strong>{{ field.label }}：</strong> {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <!-- 貼文內容 -->
+      <textarea name="content" class="input-box" placeholder="What's new?">{{ form.content.value }}</textarea>
+
+      <!-- 標題欄位 -->
+      <input type="text" name="title" class="input-box" placeholder="Title" value="{{ form.title.value }}">
+
+      <!-- 選擇地點 -->
+      <select name="location" class="input-box">
+        <option value="">Select Location</option>
+        {% for loc in locations %}
+          <option value="{{ loc.id }}" {% if form.location.value|stringformat:"s" == loc.id|stringformat:"s" %}selected{% endif %}>{{ loc.name }}</option>
+        {% endfor %}
+      </select>
+
+      <!-- 選擇分類 -->
+      <select name="category" class="input-box">
+        <option value="">Select Category</option>
+        {% for cat in categories %}
+          <option value="{{ cat.id }}" {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+
+      <!-- 地址欄位 -->
+      <input type="text" name="address" class="input-box" placeholder="Address" value="{{ form.address.value }}">
+
+      <!-- 圖片上傳欄位 -->
+      <div class="file-upload">
+        <label for="imageInput" class="upload-label">+ Replace Photo(s)</label>
+        <input type="file" name="images" id="imageInput" accept="image/*" multiple>
+      </div>
+
+      <!-- 現有圖片預覽 -->
+      <div class="preview" id="previewBox">
+        {% for photo in post.photos.all %}
+          <img src="{{ photo.image.url }}" alt="Uploaded Photo">
+        {% endfor %}
+      </div>
+
+      <!-- 送出與取消按鈕 -->
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button type="submit" class="update-btn">Update</button>
+        <a href="{% url 'post_detail' pk=post.pk %}" class="cancel-btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- 圖片即時預覽功能 -->
+  <script>
+    document.getElementById("imageInput").addEventListener("change", function(event) {
+      const preview = document.getElementById("previewBox");
+      preview.innerHTML = "";
+      const files = event.target.files;
+      for (let i = 0; i < files.length; i++) {
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(files[i]);
+        preview.appendChild(img);
+      }
+    });
+  </script>
+</body>
+</html>

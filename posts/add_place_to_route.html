@@ -1,0 +1,15 @@
+{% extends 'posts/base.html' %}
+{% block content %}
+<h2>为路线 "{{ route.name }}" 添加景点</h2>
+<form method="post">
+    {% csrf_token %}
+    <label for="place_id">选择景点：</label>
+    <select name="place_id" id="place_id" required>
+        {% for place in places %}
+            <option value="{{ place.id }}">{{ place.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">添加</button>
+</form>
+<a href="{% url 'my_routes' %}">返回</a>
+{% endblock %}
