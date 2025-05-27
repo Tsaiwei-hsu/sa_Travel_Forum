@@ -39,12 +39,27 @@
     cursor: pointer;
   }
 
-  .my-posts {
-    margin-top: 40px;
+  .cancel-link {
+    background-color: #ddd;
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    display: inline-block;
   }
 
-  .my-posts h3 {
-    margin-bottom: 16px;
+  .tab-button {
+    background-color: #eee;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-right: 10px;
+    border-radius: 8px;
+  }
+
+  .tab-button.active {
+    background-color: #81919f;
+    color: white;
   }
 
   .post-item {
@@ -64,88 +79,53 @@
     margin-bottom: 10px;
   }
 
-  .post-item h4 {
-    margin: 0 0 8px 0;
-    font-size: 18px;
+  .post-horizontal {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
   }
 
-  .post-item p {
-    color: #555;
-    margin-bottom: 10px;
-  }
-
-  .post-item a,
-  .post-item form button {
-    color: #007bff;
-    text-decoration: none;
-    margin-right: 10px;
-    background: none;
-    border: none;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  .post-item a.button-link {
-    background-color: #81919f;
-    color: white;
-    padding: 8px 14px;
+  .post-image-wrapper img {
+    width: 140px;
+    height: 100px;
+    object-fit: cover;
     border-radius: 8px;
+    flex-shrink: 0;
   }
 
-  .change-password {
-    margin-top: 30px;
+  .post-text {
+    flex: 1;
   }
 
   .toggle-section {
     display: none;
   }
 
-  .tab-button {
-    background-color: #eee;
+  .link-button {
+    color: #007bff;
+    background: none;
     border: none;
-    padding: 10px 20px;
+    padding: 0;
+    font: inherit;
     cursor: pointer;
-    margin-right: 10px;
-    border-radius: 8px;
+    font-size: 14px;
+    text-decoration: none;
   }
 
-  .tab-button.active {
-    background-color: #81919f;
-    color: white;
+  .link-button:hover {
+    text-decoration: underline;
   }
 
-  .post-horizontal {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-}
+  @media (max-width: 600px) {
+    .post-horizontal {
+      flex-direction: column;
+    }
 
-.post-image-wrapper img {
-  width: 140px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-
-.post-text {
-  flex: 1;
-}
-
-/* RWD: 小螢幕時變成直排 */
-@media (max-width: 600px) {
-  .post-horizontal {
-    flex-direction: column;
+    .post-image-wrapper img {
+      width: 100%;
+      height: auto;
+    }
   }
-
-  .post-image-wrapper img {
-    width: 100%;
-    height: auto;
-  }
-}
-
 </style>
 
 <div class="profile-container">
@@ -170,20 +150,24 @@
       {% endif %}
       <input type="file" name="avatar" id="id_avatar">
     </div>
-    
-  
+
     <div style="display: flex; gap: 12px;">
       <button type="submit" class="submit-btn">儲存修改</button>
-      <a href="{% url 'profile' %}" class="submit-btn" style="background: #ddd; color: #333;">取消修改</a>
+      <a href="{% url 'profile' %}" class="cancel-link">取消修改</a>
     </div>
   </form>
+
   <div style="margin-top: 20px; font-size: 0.9rem; color: gray;">
     注意：修改使用者名稱或電子郵件可能會影響你的登入方式。
-  <div class="change-password">
+  </div>
+
+  <div class="change-password" style="margin-top: 16px;">
     <a href="{% url 'password_change' %}">更改密碼</a>
   </div>
 
-  <div style="margin-top: 40px;">
+  <hr style="margin: 40px 0; border: none; border-top: 1px solid #9d9d9d;">
+
+  <div style="margin-bottom: 20px;">
     <button class="tab-button active" onclick="showSection('posts', event)">我發表的貼文</button>
     <button class="tab-button" onclick="showSection('favorites', event)">我收藏的貼文</button>
     <button class="tab-button" onclick="showSection('drafts-section', event)">我的草稿</button>
@@ -204,7 +188,7 @@
           <a href="{% url 'edit_post' post.pk %}">編輯</a>
           <form action="{% url 'delete_post' post.pk %}" method="post" style="display:inline">
             {% csrf_token %}
-            <button type="submit" onclick="return confirm('你確定要刪除這則貼文嗎？');">刪除</button>
+            <button type="submit" class="link-button" onclick="return confirm('你確定要刪除這則貼文嗎？');">刪除</button>
           </form>
         </div>
       </div>
@@ -212,11 +196,9 @@
       <p>你尚未發表任何貼文。</p>
     {% endfor %}
   </div>
-  
 
-<!-- 我的收藏 -->
   <div id="favorites" class="my-posts toggle-section" style="display: none;">
-  {% for fav in favorites %}
+    {% for fav in favorites %}
       <div class="post-item">
         {% if fav.post.photos.all %}
           <img src="{{ fav.post.photos.all.0.image.url }}" alt="封面圖">
@@ -230,74 +212,51 @@
     {% endfor %}
   </div>
 
-  <!-- 我的草稿 -->
   <div id="drafts-section" class="my-posts toggle-section" style="display: none;">
-    <h3>我的草稿貼文</h3>
     {% if user_drafts %}
       {% for draft in user_drafts %}
-        {% if draft.pk %}
-          <div class="post-item post-horizontal">
-            {% if draft.photos.all %}
-              <div class="post-image-wrapper">
-                <img src="{{ draft.photos.all.0.image.url }}" alt="封面圖">
-              </div>
-            {% endif %}
-            <div class="post-text">
-              <h4>{{ draft.title }}</h4>
-              <p>{{ draft.content|truncatewords:20 }}</p>
-  
-              <!-- 編輯草稿連結 -->
-              <a href="{% url 'edit_draft' draft.pk %}" class="update-btn">編輯</a>
-  
-              <!-- 刪除草稿按鈕 -->
-              <form method="POST" action="{% url 'delete_post' pk=draft.pk %}" onsubmit="return confirm('確定要刪除此草稿嗎？');" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="cancel-btn">刪除</button>
-              </form>
+        <div class="post-item post-horizontal">
+          {% if draft.photos.all %}
+            <div class="post-image-wrapper">
+              <img src="{{ draft.photos.all.0.image.url }}" alt="封面圖">
             </div>
+          {% endif %}
+          <div class="post-text">
+            <h4>{{ draft.title }}</h4>
+            <p>{{ draft.content|truncatewords:20 }}</p>
+            <a href="{% url 'edit_draft' draft.pk %}" class="update-btn">編輯</a>
+            <form method="POST" action="{% url 'delete_post' pk=draft.pk %}" onsubmit="return confirm('確定要刪除此草稿嗎？');" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="link-button">刪除</button>
+            </form>
           </div>
-        {% endif %}
+        </div>
       {% endfor %}
     {% else %}
       <p>你目前沒有草稿。</p>
     {% endif %}
-  </div>  
+  </div>
 </div>
 
 <script>
   function showSection(sectionId, event) {
     document.querySelectorAll('.toggle-section').forEach(el => el.style.display = 'none');
-
-    const selectedSection = document.getElementById(sectionId);
-    if (selectedSection) selectedSection.style.display = 'block';
-
+    const selected = document.getElementById(sectionId);
+    if (selected) selected.style.display = 'block';
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     if (event) event.target.classList.add('active');
   }
 
-  // ✅ 自動顯示後端指定的 section（如 drafts）
   document.addEventListener('DOMContentLoaded', function () {
     const section = "{{ section|default:'posts' }}";
-
-    // 顯示對應區塊
-    if (section === 'drafts') {
-      showSection('drafts-section');
-    } else if (section === 'favorites') {
-      showSection('favorites');
-    } else {
-      showSection('posts');
-    }
-
-    // 同步按鈕樣式
-    const tabButtons = document.querySelectorAll('.tab-button');
-    tabButtons.forEach(btn => {
+    showSection(section);
+    document.querySelectorAll('.tab-button').forEach(btn => {
       if (btn.textContent.includes('草稿') && section === 'drafts') btn.classList.add('active');
       else if (btn.textContent.includes('收藏') && section === 'favorites') btn.classList.add('active');
       else if (btn.textContent.includes('發表') && section === 'posts') btn.classList.add('active');
     });
   });
 
-  // 預覽頭像
   document.getElementById('id_avatar').addEventListener('change', function (event) {
     const preview = document.getElementById('avatarPreview');
     const file = event.target.files[0];
@@ -305,7 +264,5 @@
       preview.src = URL.createObjectURL(file);
     }
   });
-
-
 </script>
 {% endblock %}
