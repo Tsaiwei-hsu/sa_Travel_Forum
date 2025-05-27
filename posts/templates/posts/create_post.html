@@ -2,16 +2,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- 基本設定與標題 -->
   <meta charset="UTF-8">
   <title>Create Post</title>
-
-  <!-- 載入自訂樣式 -->
   <link rel="stylesheet" href="{% static 'style.css' %}">
-
-  <!-- 內嵌表單與樣式設計 -->
   <style>
-    /* 網頁基本樣式與版面配置 */
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #f2f4f8;
@@ -20,7 +14,6 @@
       justify-content: center;
     }
 
-    /* 表單外框容器 */
     .post-container {
       background: #ffffff;
       width: 600px;
@@ -29,35 +22,25 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     }
 
-    /* 表單標題與頭像區塊 */
     .post-header {
       display: flex;
       align-items: center;
       margin-bottom: 20px;
     }
 
-    /* 使用者頭像樣式 */
     .avatar {
       width: 50px;
       height: 50px;
       border-radius: 50%;
       margin-right: 15px;
+      object-fit: cover;
     }
 
-    /* 使用者資訊樣式 */
     .post-user-info {
       font-size: 16px;
       color: #333;
     }
 
-    /* 表單欄位整體樣式 */
-    .post-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* 單一欄位輸入框（input/select/textarea） */
     .input-box, select {
       padding: 10px 12px;
       border: 1px solid #ccc;
@@ -65,21 +48,14 @@
       font-size: 15px;
       width: 100%;
       box-sizing: border-box;
-      color: #333;
+      margin-bottom: 12px;
     }
 
-    /* 預設提示字樣顏色 */
-    .input-box::placeholder {
-      color: #aaa;
-    }
-
-    /* 多行文字框（旅遊內容） */
     textarea.input-box {
       height: 100px;
       resize: vertical;
     }
 
-    /* 上傳按鈕的樣式 */
     .upload-label {
       display: inline-block;
       background: #dfe6f3;
@@ -88,21 +64,20 @@
       cursor: pointer;
       font-weight: 500;
       color: #1f3f6e;
+      margin-bottom: 12px;
     }
 
-    /* 隱藏原生檔案上傳按鈕 */
     .file-upload input[type="file"] {
       display: none;
     }
 
-    /* 圖片預覽區塊 */
     .preview {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      margin-bottom: 16px;
     }
 
-    /* 單張預覽圖片樣式 */
     .preview img {
       width: 100px;
       height: 100px;
@@ -111,128 +86,103 @@
       border: 1px solid #ccc;
     }
 
-    /* 送出按鈕樣式 */
-    .submit-btn {
-      padding: 12px 20px;
-      background-color: #4a90e2;
-      color: white;
-      border: none;
-      font-size: 16px;
+    .button-group {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      padding: 10px 18px;
       font-weight: bold;
-      border-radius: 10px;
+      border-radius: 8px;
+      border: none;
       cursor: pointer;
-      transition: background-color 0.2s ease-in-out;
     }
 
-    .submit-btn:hover {
-      background-color: #357ab8;
-    }
+    .btn-primary { background-color: #4a90e2; color: white; }
+    .btn-secondary { background-color: #aaa; color: white; }
+    .btn-danger { background-color: #ddd; color: black; }
 
-    /* 錯誤訊息樣式 */
-    .error-field {
-      border: 2px solid red !important;
-      background-color: #fff8f8;
-    }
-
+    .btn:hover { opacity: 0.9; }
   </style>
 </head>
 <body>
-
-  <!-- 表單主容器 -->
-  <div class="post-container">
-
-    <!-- 使用者資訊區塊 -->
-    <div class="post-header">
-      {% if user.is_authenticated and user.userprofile.avatar %}
-        <img src="{{ user.userprofile.avatar.url }}" class="avatar">
-      {% else %}
-        <img src="{% static 'img/default_avatar.png' %}" class="avatar">
-      {% endif %}
-      <div class="post-user-info">
-        <strong>{{ user.username }}</strong> &gt; <em>Add your post</em>
-      </div>
+<div class="post-container">
+  <div class="post-header">
+    {% if user.userprofile.avatar %}
+      <img src="{{ user.userprofile.avatar.url }}" class="avatar">
+    {% else %}
+      <img src="{% static 'img/default_avatar.png' %}" class="avatar">
+    {% endif %}
+    <div class="post-user-info">
+      <strong>{{ user.username }}</strong> &gt; <em>Add your post</em>
     </div>
-
-    <!-- 發文表單 -->
-    <form method="POST" enctype="multipart/form-data" class="post-form">
-      {% csrf_token %}
-
-      <!-- 標題欄位 -->
-      <input type="text" name="title"
-          class="input-box {% if form.title.errors %}error-field{% endif %}"
-          placeholder="標題"
-          value="{{ form.title.value|default_if_none:'' }}">
-      {{ form.title.errors }}
-
-      <!-- 貼文內容欄位 -->
-      <textarea name="content"
-          class="input-box {% if form.content.errors %}error-field{% endif %}"
-          placeholder="分享你的旅遊心得...">{{ form.content.value|default_if_none:'' }}</textarea>
-      {{ form.content.errors }}
-
-      <!-- 地點下拉選單 -->
-      <select name="location"
-          class="input-box {% if form.location.errors %}error-field{% endif %}">
-      <option value="">選擇地點</option>
-      {% for loc in locations %}
-        <option value="{{ loc.id }}"
-          {% if form.location.value|stringformat:"s" == loc.id|stringformat:"s" %}selected{% endif %}>
-          {{ loc.name }}
-        </option>
-      {% endfor %}
-      </select>
-      {{ form.location.errors }}
-
-      <!-- 分類下拉選單 -->
-      <select name="category"
-          class="input-box {% if form.category.errors %}error-field{% endif %}">
-      <option value="">選擇分類</option>
-      {% for cat in categories %}
-        <option value="{{ cat.id }}"
-          {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>
-          {{ cat.name }}
-        </option>
-      {% endfor %}
-      </select>
-      {{ form.category.errors }}
-
-      <!-- 地址欄位 -->
-      <input type="text" name="address"
-          class="input-box {% if form.address.errors %}error-field{% endif %}"
-          placeholder="地址"
-          value="{{ form.address.value|default_if_none:'' }}">
-      {{ form.address.errors }}
-
-      <!-- 圖片上傳欄位 -->
-      <div class="file-upload">
-        <label for="imageInput" class="upload-label">+ Add Photo</label>
-        <input type="file" name="images" id="imageInput" accept="image/*" multiple>
-      </div>
-
-      <!-- 圖片預覽框 -->
-      <div class="preview" id="previewBox"></div>
-
-      <!-- 提交按鈕 -->
-      <div class="button-group">
-        <button type="submit" name="publish" class="btn btn-primary">發佈</button>
-        <button type="submit" name="save_draft" class="btn btn-secondary">儲存草稿</button>
-        <button type="submit" name="cancel" class="btn btn-danger">取消</button>
-      </div>
-    </form>
   </div>
 
-  <!-- 前端圖片即時預覽功能 -->
-  <script>
-    document.getElementById("imageInput").addEventListener("change", function(event) {
-      const preview = document.getElementById("previewBox");
-      preview.innerHTML = "";
-      const files = event.target.files;
-      for (let i = 0; i < files.length; i++) {
-        const img = document.createElement("img");
-        img.src = URL.createObjectURL(files[i]);
-        preview.appendChild(img);
-      }
-    });
-  </script>
+  {% if messages %}
+    {% for message in messages %}
+      <div style="padding: 10px; margin-bottom: 16px; border-left: 4px solid #4a90e2; background: #eaf4ff; color: #333; border-radius: 6px;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div style="background: #fffbea; padding: 10px 14px; margin-bottom: 18px; border-left: 4px solid #f1c40f; border-radius: 8px; color: #333;">
+    📸 照片若需刪除，請先儲存草稿再刪除。謝謝
+  </div> 
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- 各欄位 -->
+    <input type="text" name="title" class="input-box" placeholder="標題" value="{{ form.title.value|default_if_none:'' }}">
+    <textarea name="content" class="input-box" placeholder="內容">{{ form.content.value|default_if_none:'' }}</textarea>
+
+    <select name="location" class="input-box">
+      <option value="">選擇地點</option>
+      {% for loc in locations %}
+        <option value="{{ loc.id }}" {% if form.location.value|stringformat:"s" == loc.id|stringformat:"s" %}selected{% endif %}>{{ loc.name }}</option>
+      {% endfor %}
+    </select>
+
+    <select name="category" class="input-box">
+      <option value="">選擇分類</option>
+      {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+
+    <input type="text" name="address" class="input-box" placeholder="地址" value="{{ form.address.value|default_if_none:'' }}">
+
+    <!-- 多圖上傳 -->
+    <div class="file-upload">
+      <label class="upload-label" for="imageInput">+ Add Photo</label>
+      <input id="imageInput" type="file" name="images" multiple accept="image/*">
+    </div>
+
+    <!-- 圖片預覽 -->
+    <div class="preview" id="previewBox"></div>
+
+    <!-- 按鈕列 -->
+    <div class="button-group">
+      <button type="submit" name="publish" class="btn btn-primary">發佈</button>
+      <button type="submit" name="save_draft" class="btn btn-secondary">儲存草稿</button>
+      <button type="submit" name="cancel" class="btn btn-danger">取消</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.getElementById("imageInput").addEventListener("change", function(event) {
+    const preview = document.getElementById("previewBox");
+    preview.innerHTML = "";
+    const files = event.target.files;
+    for (let i = 0; i < files.length; i++) {
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(files[i]);
+      preview.appendChild(img);
+    }
+  });
+</script>
 </body>
 </html>

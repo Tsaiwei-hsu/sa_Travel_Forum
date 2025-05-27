@@ -6,7 +6,6 @@
   <title>Edit Draft</title>
   <link rel="stylesheet" href="{% static 'style.css' %}">
   <style>
-    /* === 整體排版與風格 === */
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #f2f4f8;
@@ -42,13 +41,6 @@
       color: #333;
     }
 
-    /* === 表單與輸入樣式 === */
-    .post-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
     .input-box, select {
       padding: 10px 12px;
       border: 1px solid #ccc;
@@ -56,6 +48,7 @@
       font-size: 15px;
       width: 100%;
       box-sizing: border-box;
+      margin-bottom: 12px;
     }
 
     textarea.input-box {
@@ -71,6 +64,7 @@
       cursor: pointer;
       font-weight: 500;
       color: #1f3f6e;
+      margin-bottom: 12px;
     }
 
     .file-upload input[type="file"] {
@@ -81,6 +75,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      margin-bottom: 16px;
     }
 
     .preview img {
@@ -91,196 +86,146 @@
       border: 1px solid #ccc;
     }
 
-    /* === 按鈕統一樣式 === */
-    .update-btn, .cancel-btn {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0 20px;
-      font-size: 16px;
-      font-weight: 600;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-      height: 44px;
-      min-width: 110px;
-      text-align: center;
-      text-decoration: none;
-      box-sizing: border-box;
-    }
-
-    .update-btn {
-      background-color: #8cabb4;
-      color: white;
-    }
-
-    .update-btn:hover {
-      background-color: #6f95a3;
-    }
-
-    .publish-btn {
-      background-color: #9abad0;
-    }
-
-    .publish-btn:hover {
-      background-color: #7fa5c2;
-    }
-
-    .cancel-btn {
-      background-color: #bdbdbd;
-      color: #000;
-    }
-
-    .cancel-btn:hover {
-      background-color: #999;
-    }
-
-    /* === 表單錯誤與提示 === */
-    .errorlist {
-      color: red;
-      font-size: 14px;
-      margin: 5px 0;
-      list-style: none;
-      padding: 0;
-    }
-
-    .form-errors {
-      background: #ffd2d2;
-      color: #a33;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 20px;
+    .photo-box {
+      position: relative;
+      display: inline-block;
     }
 
     .delete-photo-btn {
       position: absolute;
-      top: 5px;
-      right: 5px;
-      background: rgba(255, 0, 0, 0.7);
+      top: -6px;
+      right: -6px;
+      background: #f00;
       color: white;
       border: none;
       border-radius: 50%;
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       cursor: pointer;
     }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary { background-color: #4a90e2; color: white; }
+    .btn-secondary { background-color: #8a9ca9; color: white; }
+    .btn-danger { background-color: #d6d6d6; color: black; }
+
+    .btn:hover { opacity: 0.9; }
   </style>
 </head>
 <body>
-  <div class="post-container">
-    <div class="post-header">
-      {% if user.is_authenticated and user.userprofile.avatar %}
-        <img src="{{ user.userprofile.avatar.url }}" class="avatar">
-      {% else %}
-        <img src="{% static 'img/default_avatar.png' %}" class="avatar">
-      {% endif %}
-      <div class="post-user-info">
-        <strong>{{ user.username }}</strong> &gt; <em>Edit your draft</em>
-      </div>
+<div class="post-container">
+  <div class="post-header">
+    {% if user.userprofile.avatar %}
+      <img src="{{ user.userprofile.avatar.url }}" class="avatar">
+    {% else %}
+      <img src="{% static 'img/default_avatar.png' %}" class="avatar">
+    {% endif %}
+    <div class="post-user-info">
+      <strong>{{ user.username }}</strong> &gt; <em>Edit your draft</em>
     </div>
-
-    <!-- 草稿提示 -->
-    <div style="padding: 10px; background: #fffbe6; border-left: 6px solid #f1c40f; border-radius: 8px; margin-bottom: 20px; color: #333;">
-      <p style="margin: 0;">⚠️ 此篇仍為草稿狀態，尚未發佈。</p>
-      <p style="margin: 4px 0 0;">📸 照片若需刪除，請先儲存草稿再刪除。謝謝</p>
-    </div>
-    
-
-    <!-- 表單開始 -->
-    <form method="POST" enctype="multipart/form-data" class="post-form">
-      {% csrf_token %}
-
-      {% if form.errors %}
-        <div class="form-errors">
-          請修正以下欄位錯誤：
-          <ul>
-            {% for field in form %}
-              {% for error in field.errors %}
-                <li><strong>{{ field.label }}：</strong> {{ error }}</li>
-              {% endfor %}
-            {% endfor %}
-          </ul>
-        </div>
-      {% endif %}
-
-      <textarea name="content" class="input-box" placeholder="What's new?">{{ form.content.value }}</textarea>
-      <input type="text" name="title" class="input-box" placeholder="Title" value="{{ form.title.value }}">
-      <select name="location" class="input-box">
-        <option value="">Select Location</option>
-        {% for loc in locations %}
-          <option value="{{ loc.id }}" {% if form.location.value|stringformat:"s" == loc.id|stringformat:"s" %}selected{% endif %}>{{ loc.name }}</option>
-        {% endfor %}
-      </select>
-      <select name="category" class="input-box">
-        <option value="">Select Category</option>
-        {% for cat in categories %}
-          <option value="{{ cat.id }}" {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
-        {% endfor %}
-      </select>
-      <input type="text" name="address" class="input-box" placeholder="Address" value="{{ form.address.value }}">
-
-      <!-- 上傳圖片 -->
-      <div class="file-upload">
-        <label for="imageInput" class="upload-label">+ Replace Photo(s)</label>
-        <input type="file" name="images" id="imageInput" accept="image/*" multiple>
-      </div>
-
-      <!-- 現有圖片預覽 -->
-      <div class="preview" id="previewBox">
-        {% for photo in post.photos.all %}
-          <div class="photo-wrapper" data-photo-id="{{ photo.id }}" style="position: relative; display: inline-block;">
-            <img src="{{ photo.image.url }}" alt="Uploaded Photo">
-            <button type="button" class="delete-photo-btn">×</button>
-          </div>
-        {% endfor %}
-      </div>
-
-      <!-- 按鈕列 -->
-      <div style="display: flex; gap: 12px; justify-content: flex-end;">
-        <button type="submit" name="save" class="update-btn">儲存草稿</button>
-        <button type="submit" name="publish" class="update-btn publish-btn">立即發佈</button>
-        <form action="{% url 'profile' %}" method="get" style="display:inline;">
-          <button type="submit" class="cancel-btn">取消修改</button>
-        </form>
-      </div>
-    </form>
   </div>
 
-  <!-- JavaScript 功能 -->
-  <script>
-    document.getElementById("imageInput").addEventListener("change", function(event) {
-      const preview = document.getElementById("previewBox");
-      preview.innerHTML = "";
-      const files = event.target.files;
-      for (let i = 0; i < files.length; i++) {
-        const img = document.createElement("img");
-        img.src = URL.createObjectURL(files[i]);
-        preview.appendChild(img);
+  <div style="background: #fffbea; padding: 10px 14px; margin-bottom: 18px; border-left: 4px solid #f1c40f; border-radius: 8px; color: #333;">
+    ⚠️ 此篇仍為草稿狀態，尚未發佈。<br>
+    📸 照片若需刪除，請先儲存草稿再刪除。謝謝
+  </div>  
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- 各欄位 -->
+    <input type="text" name="title" class="input-box" placeholder="標題" value="{{ form.title.value|default_if_none:'' }}">
+    <textarea name="content" class="input-box" placeholder="內容">{{ form.content.value|default_if_none:'' }}</textarea>
+
+    <select name="location" class="input-box">
+      <option value="">選擇地點</option>
+      {% for loc in locations %}
+        <option value="{{ loc.id }}" {% if form.location.value|stringformat:"s" == loc.id|stringformat:"s" %}selected{% endif %}>{{ loc.name }}</option>
+      {% endfor %}
+    </select>
+
+    <select name="category" class="input-box">
+      <option value="">選擇分類</option>
+      {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+
+    <input type="text" name="address" class="input-box" placeholder="地址" value="{{ form.address.value|default_if_none:'' }}">
+
+    <!-- 多圖上傳 -->
+    <div class="file-upload">
+      <label class="upload-label" for="imageInput">+ Add Photo</label>
+      <input id="imageInput" type="file" name="images" multiple accept="image/*">
+    </div>
+
+    <!-- 新圖片預覽 -->
+    <div class="preview" id="previewBox"></div>
+
+    <!-- 原有圖片 -->
+    <div class="preview">
+      {% for photo in photos %}
+        <div class="photo-box" id="photo-{{ photo.id }}">
+          <img src="{{ photo.image.url }}">
+          <button type="button" class="delete-photo-btn" data-id="{{ photo.id }}">×</button>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- 按鈕 -->
+    <div class="button-group">
+      <button type="submit" name="save_draft" class="btn btn-secondary">儲存草稿</button>
+      <button type="submit" name="publish" class="btn btn-primary">立即發佈</button>
+      <a href="{% url 'post_detail' post.pk %}" class="btn btn-danger">取消修改</a>
+    </div>
+  </form>
+</div>
+
+<!-- JS -->
+<script>
+  document.getElementById("imageInput").addEventListener("change", function(event) {
+    const preview = document.getElementById("previewBox");
+    preview.innerHTML = "";
+    const files = event.target.files;
+    for (let i = 0; i < files.length; i++) {
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(files[i]);
+      preview.appendChild(img);
+    }
+  });
+
+  document.querySelectorAll('.delete-photo-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      const photoId = this.dataset.id;
+      if (confirm("確定要刪除這張圖片嗎？")) {
+        fetch(`/delete_photo/${photoId}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+          },
+        }).then(response => {
+          if (response.ok) {
+            document.getElementById(`photo-${photoId}`).remove();
+          } else {
+            alert('刪除失敗');
+          }
+        });
       }
     });
-
-    document.querySelectorAll('.delete-photo-btn').forEach(button => {
-      button.addEventListener('click', function () {
-        const wrapper = this.closest('.photo-wrapper');
-        const photoId = wrapper.getAttribute('data-photo-id');
-        if (confirm("確定要刪除這張圖片嗎？")) {
-          fetch(`/delete_photo/${photoId}/`, {
-            method: 'POST',
-            headers: {
-              'X-CSRFToken': '{{ csrf_token }}',
-              'Content-Type': 'application/json'
-            },
-          })
-          .then(response => {
-            if (response.ok) {
-              wrapper.remove();
-            } else {
-              alert('刪除失敗');
-            }
-          });
-        }
-      });
-    });
-  </script>
+  });
+</script>
 </body>
 </html>

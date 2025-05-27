@@ -164,15 +164,21 @@
     <div class="form-group">
       <label for="id_avatar">頭貼：</label><br>
       {% if request.user.userprofile.avatar %}
-        <img src="{{ request.user.userprofile.avatar.url }}" width="100" style="border-radius: 50%;"><br><br>
+        <img id="avatarPreview" src="{{ request.user.userprofile.avatar.url }}" width="100" style="border-radius: 50%;"><br><br>
       {% else %}
-        <p style="color: gray;">尚未上傳新頭像</p>
+        <img id="avatarPreview" src="{% static 'img/default_avatar.png' %}" width="100" style="border-radius: 50%;"><br><br>
       {% endif %}
       <input type="file" name="avatar" id="id_avatar">
     </div>
-    <button type="submit" class="submit-btn">儲存修改</button>
+    
+  
+    <div style="display: flex; gap: 12px;">
+      <button type="submit" class="submit-btn">儲存修改</button>
+      <a href="{% url 'profile' %}" class="submit-btn" style="background: #ddd; color: #333;">取消修改</a>
+    </div>
   </form>
-
+  <div style="margin-top: 20px; font-size: 0.9rem; color: gray;">
+    注意：修改使用者名稱或電子郵件可能會影響你的登入方式。
   <div class="change-password">
     <a href="{% url 'password_change' %}">更改密碼</a>
   </div>
@@ -290,5 +296,16 @@
       else if (btn.textContent.includes('發表') && section === 'posts') btn.classList.add('active');
     });
   });
+
+  // 預覽頭像
+  document.getElementById('id_avatar').addEventListener('change', function (event) {
+    const preview = document.getElementById('avatarPreview');
+    const file = event.target.files[0];
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+    }
+  });
+
+
 </script>
 {% endblock %}

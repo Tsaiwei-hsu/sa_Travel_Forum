@@ -31,8 +31,8 @@ class Post(models.Model):
 
 # 貼文圖片模型（多張圖片對應一篇貼文）
 class Photo(models.Model):
-    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='photos')  
-    image = models.ImageField(upload_to='post_photos/')  #
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='photos')
+    image = models.ImageField(upload_to='post_photos/')
 
 # 留言模型（多則留言對應一篇貼文）
 class Comment(models.Model):

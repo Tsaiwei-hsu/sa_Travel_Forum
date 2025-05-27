@@ -2,6 +2,8 @@ from django import forms
 from .models import Post, Comment, UserProfile
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from .models import Photo
+
 
 # 貼文內容表單（標題、內容、分類、地點、地址）
 class PostForm(forms.ModelForm):
@@ -17,13 +19,6 @@ class PostForm(forms.ModelForm):
 # 支援多圖上傳的檔案元件
 class MultiFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
-
-# 上傳多張圖片的表單
-class PhotoForm(forms.Form):
-    images = forms.FileField(
-        widget=MultiFileInput(attrs={'multiple': True}),
-        required=False
-    )
 
 # 留言表單（只包含內容欄位）
 class CommentForm(forms.ModelForm):
@@ -62,6 +57,13 @@ class UserProfileForm(forms.ModelForm):
         widgets = {
             'avatar': forms.ClearableFileInput(attrs={
                 'class': 'form-control',
-                'style': 'border: 1px solid #000;'
-            })
+                'accept': 'image/*',  
+                'onchange': 'previewAvatar(event)'  
+            }),
         }
+
+
+class PhotoForm(forms.ModelForm):
+    class Meta:
+        model = Photo
+        fields = ['image']
