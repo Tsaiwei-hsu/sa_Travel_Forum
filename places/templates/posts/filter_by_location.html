@@ -1,0 +1,14 @@
+{% extends 'posts/base.html' %}
+{% block title %}景點類別{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>城市：{{ city.name }}</h2>
+  <ul class="list-group mt-3">
+    {% for category in categories %}
+  <a href="{% url 'filter_by_category' category.id %}?city_id={{ city.id }}">{{ category.name }}</a>
+{% endfor %}
+
+  </ul>
+</div>
+{% endblock %}

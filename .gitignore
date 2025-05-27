@@ -1,0 +1,22 @@
+# Python 編譯暫存檔案
+__pycache__/
+*.py[cod]
+*.pyo
+
+# SQLite 資料庫
+*.sqlite3
+
+# 虛擬環境
+venv/
+
+# 環境變數設定
+.env
+
+# macOS 系統檔
+.DS_Store
+
+# VS Code 編輯器設定檔（視情況加入）
+.vscode/
+
+# pyenv（如果有使用）
+.python-version

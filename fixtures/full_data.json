@@ -1,0 +1,1348 @@
+[
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$rffahhMiCOTawWC1hrGcaq$pmSOT+/zMPzjnFRlAxnFl1QC+3/LF1FlYAe6bxzzZy8=",
+    "last_login": "2025-05-09T15:22:15.808Z",
+    "is_superuser": false,
+    "username": "tsaiwei",
+    "first_name": "",
+    "last_name": "",
+    "email": "12345678910@test.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-05-07T17:38:22.446Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$RbeELifnpWmMo7H3dqkjTx$q+nGKSH4W+gyTbcaHBXnK0eaEDUhSYeo3SC00JfRt7Q=",
+    "last_login": "2025-05-08T09:22:15.329Z",
+    "is_superuser": false,
+    "username": "elleen",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-05-08T09:22:15.077Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$9urHJ9iShWXaNj9O4hdVDL$quOCzl+c1/dIGjyRo9Bk0LeS7psUYzy9UPfCKCH7Lyo=",
+    "last_login": "2025-05-08T09:27:24.522Z",
+    "is_superuser": false,
+    "username": "user1",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-05-08T09:27:24.268Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$9sxecr0XiCMlPytqy5VPzK$9tzGbUQXxvBXAXBwhrOu/0k4lRnp8FpA+xI4Rz9LuiE=",
+    "last_login": "2025-05-08T09:39:01.101Z",
+    "is_superuser": false,
+    "username": "user2",
+    "first_name": "",
+    "last_name": "",
+    "email": "bingq7943@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-05-08T09:39:00.847Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "myingwxvk9tqa7fzk8djdgvq0y6vj1ys",
+  "fields": {
+    "session_data": ".eJxVjMsOwiAQRf-FtSHDs-DSvd9AhgGkaiAp7cr479qkC93ec859sYDbWsM28hLmxM5MsNPvFpEeue0g3bHdOqfe1mWOfFf4QQe_9pSfl8P9O6g46rdWRevoRSaDDibwLkP0TjswMYMvSoNGRCstgSJSkyU0LkrpsWjhkdj7A9B5N5g:1uDPYF:kaA1m4YBjGsYW-Cp1ARDRIcoqJSXthDSJE4oybkkAx0",
+    "expire_date": "2025-05-23T15:22:15.810Z"
+  }
+},
+{
+  "model": "places.state",
+  "pk": 1,
+  "fields": {
+    "name": "New South Wales"
+  }
+},
+{
+  "model": "places.state",
+  "pk": 2,
+  "fields": {
+    "name": "Victoria"
+  }
+},
+{
+  "model": "places.state",
+  "pk": 3,
+  "fields": {
+    "name": "Queensland"
+  }
+},
+{
+  "model": "places.state",
+  "pk": 4,
+  "fields": {
+    "name": "South Australia"
+  }
+},
+{
+  "model": "places.state",
+  "pk": 5,
+  "fields": {
+    "name": "Western Australia"
+  }
+},
+{
+  "model": "places.state",
+  "pk": 6,
+  "fields": {
+    "name": "Tasmania"
+  }
+},
+{
+  "model": "places.state",
+  "pk": 7,
+  "fields": {
+    "name": "Northern Territory"
+  }
+},
+{
+  "model": "places.state",
+  "pk": 8,
+  "fields": {
+    "name": "Australian Capital Territory"
+  }
+},
+{
+  "model": "places.city",
+  "pk": 1,
+  "fields": {
+    "name": "Sydney",
+    "state": 1
+  }
+},
+{
+  "model": "places.city",
+  "pk": 2,
+  "fields": {
+    "name": "Newcastle",
+    "state": 1
+  }
+},
+{
+  "model": "places.city",
+  "pk": 3,
+  "fields": {
+    "name": "Wollongong",
+    "state": 1
+  }
+},
+{
+  "model": "places.city",
+  "pk": 4,
+  "fields": {
+    "name": "Melbourne",
+    "state": 2
+  }
+},
+{
+  "model": "places.city",
+  "pk": 5,
+  "fields": {
+    "name": "Geelong",
+    "state": 2
+  }
+},
+{
+  "model": "places.city",
+  "pk": 6,
+  "fields": {
+    "name": "Ballarat",
+    "state": 2
+  }
+},
+{
+  "model": "places.city",
+  "pk": 7,
+  "fields": {
+    "name": "Brisbane",
+    "state": 3
+  }
+},
+{
+  "model": "places.city",
+  "pk": 8,
+  "fields": {
+    "name": "Cairns",
+    "state": 3
+  }
+},
+{
+  "model": "places.city",
+  "pk": 9,
+  "fields": {
+    "name": "Gold Coast",
+    "state": 3
+  }
+},
+{
+  "model": "places.city",
+  "pk": 10,
+  "fields": {
+    "name": "Adelaide",
+    "state": 4
+  }
+},
+{
+  "model": "places.city",
+  "pk": 11,
+  "fields": {
+    "name": "Mount Gambier",
+    "state": 4
+  }
+},
+{
+  "model": "places.city",
+  "pk": 12,
+  "fields": {
+    "name": "Port Augusta",
+    "state": 4
+  }
+},
+{
+  "model": "places.city",
+  "pk": 13,
+  "fields": {
+    "name": "Perth",
+    "state": 5
+  }
+},
+{
+  "model": "places.city",
+  "pk": 14,
+  "fields": {
+    "name": "Fremantle",
+    "state": 5
+  }
+},
+{
+  "model": "places.city",
+  "pk": 15,
+  "fields": {
+    "name": "Broome",
+    "state": 5
+  }
+},
+{
+  "model": "places.city",
+  "pk": 16,
+  "fields": {
+    "name": "Hobart",
+    "state": 6
+  }
+},
+{
+  "model": "places.city",
+  "pk": 17,
+  "fields": {
+    "name": "Launceston",
+    "state": 6
+  }
+},
+{
+  "model": "places.city",
+  "pk": 18,
+  "fields": {
+    "name": "Darwin",
+    "state": 7
+  }
+},
+{
+  "model": "places.city",
+  "pk": 19,
+  "fields": {
+    "name": "Alice Springs",
+    "state": 7
+  }
+},
+{
+  "model": "places.city",
+  "pk": 20,
+  "fields": {
+    "name": "Canberra",
+    "state": 8
+  }
+},
+{
+  "model": "places.category",
+  "pk": 1,
+  "fields": {
+    "name": "Beaches"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 2,
+  "fields": {
+    "name": "Museums"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 3,
+  "fields": {
+    "name": "Parks"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 4,
+  "fields": {
+    "name": "Historical"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 5,
+  "fields": {
+    "name": "Shopping"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 6,
+  "fields": {
+    "name": "Art Galleries"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 7,
+  "fields": {
+    "name": "Natural"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 8,
+  "fields": {
+    "name": "Adventure"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 9,
+  "fields": {
+    "name": "Wildlife"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 10,
+  "fields": {
+    "name": "Wine Regions"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 11,
+  "fields": {
+    "name": "Mountains"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 12,
+  "fields": {
+    "name": "Culture"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 13,
+  "fields": {
+    "name": "Desert"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 14,
+  "fields": {
+    "name": "Aboriginal Heritage"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 15,
+  "fields": {
+    "name": "Hiking"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 16,
+  "fields": {
+    "name": "Outback"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 17,
+  "fields": {
+    "name": "Government"
+  }
+},
+{
+  "model": "places.category",
+  "pk": 18,
+  "fields": {
+    "name": "Lake"
+  }
+},
+{
+  "model": "places.post",
+  "pk": 1,
+  "fields": {
+    "title": "Sydney 的推薦景點 1",
+    "content": "探索 Wildlife 的精彩體驗，在 Sydney 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.908Z",
+    "author": "系統產生",
+    "state": 1,
+    "city": 1,
+    "category": 9,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 2,
+  "fields": {
+    "title": "Sydney 的推薦景點 2",
+    "content": "探索 Shopping 的精彩體驗，在 Sydney 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.910Z",
+    "author": "系統產生",
+    "state": 1,
+    "city": 1,
+    "category": 5,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 3,
+  "fields": {
+    "title": "Newcastle 的推薦景點 1",
+    "content": "探索 Natural 的精彩體驗，在 Newcastle 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.911Z",
+    "author": "系統產生",
+    "state": 1,
+    "city": 2,
+    "category": 7,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 4,
+  "fields": {
+    "title": "Newcastle 的推薦景點 2",
+    "content": "探索 Culture 的精彩體驗，在 Newcastle 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.911Z",
+    "author": "系統產生",
+    "state": 1,
+    "city": 2,
+    "category": 12,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 5,
+  "fields": {
+    "title": "Wollongong 的推薦景點 1",
+    "content": "探索 Outback 的精彩體驗，在 Wollongong 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.912Z",
+    "author": "系統產生",
+    "state": 1,
+    "city": 3,
+    "category": 16,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 6,
+  "fields": {
+    "title": "Wollongong 的推薦景點 2",
+    "content": "探索 Desert 的精彩體驗，在 Wollongong 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.913Z",
+    "author": "系統產生",
+    "state": 1,
+    "city": 3,
+    "category": 13,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 7,
+  "fields": {
+    "title": "Melbourne 的推薦景點 1",
+    "content": "探索 Parks 的精彩體驗，在 Melbourne 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.914Z",
+    "author": "系統產生",
+    "state": 2,
+    "city": 4,
+    "category": 3,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 8,
+  "fields": {
+    "title": "Melbourne 的推薦景點 2",
+    "content": "探索 Parks 的精彩體驗，在 Melbourne 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.915Z",
+    "author": "系統產生",
+    "state": 2,
+    "city": 4,
+    "category": 3,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 9,
+  "fields": {
+    "title": "Geelong 的推薦景點 1",
+    "content": "探索 Hiking 的精彩體驗，在 Geelong 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.916Z",
+    "author": "系統產生",
+    "state": 2,
+    "city": 5,
+    "category": 15,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 10,
+  "fields": {
+    "title": "Geelong 的推薦景點 2",
+    "content": "探索 Outback 的精彩體驗，在 Geelong 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.917Z",
+    "author": "系統產生",
+    "state": 2,
+    "city": 5,
+    "category": 16,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 11,
+  "fields": {
+    "title": "Ballarat 的推薦景點 1",
+    "content": "探索 Aboriginal Heritage 的精彩體驗，在 Ballarat 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.918Z",
+    "author": "系統產生",
+    "state": 2,
+    "city": 6,
+    "category": 14,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 12,
+  "fields": {
+    "title": "Ballarat 的推薦景點 2",
+    "content": "探索 Historical 的精彩體驗，在 Ballarat 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.918Z",
+    "author": "系統產生",
+    "state": 2,
+    "city": 6,
+    "category": 4,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 13,
+  "fields": {
+    "title": "Brisbane 的推薦景點 1",
+    "content": "探索 Culture 的精彩體驗，在 Brisbane 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.919Z",
+    "author": "系統產生",
+    "state": 3,
+    "city": 7,
+    "category": 12,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 14,
+  "fields": {
+    "title": "Brisbane 的推薦景點 2",
+    "content": "探索 Desert 的精彩體驗，在 Brisbane 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.920Z",
+    "author": "系統產生",
+    "state": 3,
+    "city": 7,
+    "category": 13,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 15,
+  "fields": {
+    "title": "Cairns 的推薦景點 1",
+    "content": "探索 Lake 的精彩體驗，在 Cairns 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.921Z",
+    "author": "系統產生",
+    "state": 3,
+    "city": 8,
+    "category": 18,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 16,
+  "fields": {
+    "title": "Cairns 的推薦景點 2",
+    "content": "探索 Hiking 的精彩體驗，在 Cairns 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.922Z",
+    "author": "系統產生",
+    "state": 3,
+    "city": 8,
+    "category": 15,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 17,
+  "fields": {
+    "title": "Gold Coast 的推薦景點 1",
+    "content": "探索 Historical 的精彩體驗，在 Gold Coast 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.923Z",
+    "author": "系統產生",
+    "state": 3,
+    "city": 9,
+    "category": 4,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 18,
+  "fields": {
+    "title": "Gold Coast 的推薦景點 2",
+    "content": "探索 Parks 的精彩體驗，在 Gold Coast 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.923Z",
+    "author": "系統產生",
+    "state": 3,
+    "city": 9,
+    "category": 3,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 19,
+  "fields": {
+    "title": "Adelaide 的推薦景點 1",
+    "content": "探索 Government 的精彩體驗，在 Adelaide 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.925Z",
+    "author": "系統產生",
+    "state": 4,
+    "city": 10,
+    "category": 17,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 20,
+  "fields": {
+    "title": "Adelaide 的推薦景點 2",
+    "content": "探索 Outback 的精彩體驗，在 Adelaide 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.925Z",
+    "author": "系統產生",
+    "state": 4,
+    "city": 10,
+    "category": 16,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 21,
+  "fields": {
+    "title": "Mount Gambier 的推薦景點 1",
+    "content": "探索 Mountains 的精彩體驗，在 Mount Gambier 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.926Z",
+    "author": "系統產生",
+    "state": 4,
+    "city": 11,
+    "category": 11,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 22,
+  "fields": {
+    "title": "Mount Gambier 的推薦景點 2",
+    "content": "探索 Mountains 的精彩體驗，在 Mount Gambier 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.927Z",
+    "author": "系統產生",
+    "state": 4,
+    "city": 11,
+    "category": 11,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 23,
+  "fields": {
+    "title": "Port Augusta 的推薦景點 1",
+    "content": "探索 Culture 的精彩體驗，在 Port Augusta 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.928Z",
+    "author": "系統產生",
+    "state": 4,
+    "city": 12,
+    "category": 12,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 24,
+  "fields": {
+    "title": "Port Augusta 的推薦景點 2",
+    "content": "探索 Beaches 的精彩體驗，在 Port Augusta 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.928Z",
+    "author": "系統產生",
+    "state": 4,
+    "city": 12,
+    "category": 1,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 25,
+  "fields": {
+    "title": "Perth 的推薦景點 1",
+    "content": "探索 Culture 的精彩體驗，在 Perth 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.929Z",
+    "author": "系統產生",
+    "state": 5,
+    "city": 13,
+    "category": 12,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 26,
+  "fields": {
+    "title": "Perth 的推薦景點 2",
+    "content": "探索 Outback 的精彩體驗，在 Perth 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.930Z",
+    "author": "系統產生",
+    "state": 5,
+    "city": 13,
+    "category": 16,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 27,
+  "fields": {
+    "title": "Fremantle 的推薦景點 1",
+    "content": "探索 Shopping 的精彩體驗，在 Fremantle 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.931Z",
+    "author": "系統產生",
+    "state": 5,
+    "city": 14,
+    "category": 5,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 28,
+  "fields": {
+    "title": "Fremantle 的推薦景點 2",
+    "content": "探索 Wildlife 的精彩體驗，在 Fremantle 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.932Z",
+    "author": "系統產生",
+    "state": 5,
+    "city": 14,
+    "category": 9,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 29,
+  "fields": {
+    "title": "Broome 的推薦景點 1",
+    "content": "探索 Mountains 的精彩體驗，在 Broome 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.933Z",
+    "author": "系統產生",
+    "state": 5,
+    "city": 15,
+    "category": 11,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 30,
+  "fields": {
+    "title": "Broome 的推薦景點 2",
+    "content": "探索 Lake 的精彩體驗，在 Broome 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.933Z",
+    "author": "系統產生",
+    "state": 5,
+    "city": 15,
+    "category": 18,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 31,
+  "fields": {
+    "title": "Hobart 的推薦景點 1",
+    "content": "探索 Wine Regions 的精彩體驗，在 Hobart 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.935Z",
+    "author": "系統產生",
+    "state": 6,
+    "city": 16,
+    "category": 10,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 32,
+  "fields": {
+    "title": "Hobart 的推薦景點 2",
+    "content": "探索 Wine Regions 的精彩體驗，在 Hobart 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.935Z",
+    "author": "系統產生",
+    "state": 6,
+    "city": 16,
+    "category": 10,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 33,
+  "fields": {
+    "title": "Launceston 的推薦景點 1",
+    "content": "探索 Hiking 的精彩體驗，在 Launceston 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.936Z",
+    "author": "系統產生",
+    "state": 6,
+    "city": 17,
+    "category": 15,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 34,
+  "fields": {
+    "title": "Launceston 的推薦景點 2",
+    "content": "探索 Hiking 的精彩體驗，在 Launceston 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.937Z",
+    "author": "系統產生",
+    "state": 6,
+    "city": 17,
+    "category": 15,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 35,
+  "fields": {
+    "title": "Darwin 的推薦景點 1",
+    "content": "探索 Mountains 的精彩體驗，在 Darwin 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.938Z",
+    "author": "系統產生",
+    "state": 7,
+    "city": 18,
+    "category": 11,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 36,
+  "fields": {
+    "title": "Darwin 的推薦景點 2",
+    "content": "探索 Aboriginal Heritage 的精彩體驗，在 Darwin 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.939Z",
+    "author": "系統產生",
+    "state": 7,
+    "city": 18,
+    "category": 14,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 37,
+  "fields": {
+    "title": "Alice Springs 的推薦景點 1",
+    "content": "探索 Lake 的精彩體驗，在 Alice Springs 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.940Z",
+    "author": "系統產生",
+    "state": 7,
+    "city": 19,
+    "category": 18,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 38,
+  "fields": {
+    "title": "Alice Springs 的推薦景點 2",
+    "content": "探索 Lake 的精彩體驗，在 Alice Springs 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.940Z",
+    "author": "系統產生",
+    "state": 7,
+    "city": 19,
+    "category": 18,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 39,
+  "fields": {
+    "title": "Canberra 的推薦景點 1",
+    "content": "探索 Parks 的精彩體驗，在 Canberra 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.942Z",
+    "author": "系統產生",
+    "state": 8,
+    "city": 20,
+    "category": 3,
+    "address": ""
+  }
+},
+{
+  "model": "places.post",
+  "pk": 40,
+  "fields": {
+    "title": "Canberra 的推薦景點 2",
+    "content": "探索 Museums 的精彩體驗，在 Canberra 絕對不能錯過！",
+    "created_at": "2025-05-07T17:20:31.942Z",
+    "author": "系統產生",
+    "state": 8,
+    "city": 20,
+    "category": 2,
+    "address": ""
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 1,
+  "fields": {
+    "name": "Sydney"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 2,
+  "fields": {
+    "name": "Newcastle"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 3,
+  "fields": {
+    "name": "Wollongong"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 4,
+  "fields": {
+    "name": "Melbourne"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 5,
+  "fields": {
+    "name": "Geelong"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 6,
+  "fields": {
+    "name": "Ballarat"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 7,
+  "fields": {
+    "name": "Brisbane"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 8,
+  "fields": {
+    "name": "Cairns"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 9,
+  "fields": {
+    "name": "Gold Coast"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 10,
+  "fields": {
+    "name": "Adelaide"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 11,
+  "fields": {
+    "name": "Mount Gambier"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 12,
+  "fields": {
+    "name": "Port Augusta"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 13,
+  "fields": {
+    "name": "Perth"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 14,
+  "fields": {
+    "name": "Fremantle"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 15,
+  "fields": {
+    "name": "Broome"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 16,
+  "fields": {
+    "name": "Hobart"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 17,
+  "fields": {
+    "name": "Launceston"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 18,
+  "fields": {
+    "name": "Darwin"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 19,
+  "fields": {
+    "name": "Alice Springs"
+  }
+},
+{
+  "model": "posts.location",
+  "pk": 20,
+  "fields": {
+    "name": "Canberra"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 1,
+  "fields": {
+    "name": "Beaches"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 2,
+  "fields": {
+    "name": "Museums"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 3,
+  "fields": {
+    "name": "Parks"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 4,
+  "fields": {
+    "name": "Historical"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 5,
+  "fields": {
+    "name": "Shopping"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 6,
+  "fields": {
+    "name": "Art Galleries"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 7,
+  "fields": {
+    "name": "Natural"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 8,
+  "fields": {
+    "name": "Adventure"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 9,
+  "fields": {
+    "name": "Wildlife"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 10,
+  "fields": {
+    "name": "Wine Regions"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 11,
+  "fields": {
+    "name": "Mountains"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 12,
+  "fields": {
+    "name": "Culture"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 13,
+  "fields": {
+    "name": "Desert"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 14,
+  "fields": {
+    "name": "Aboriginal Heritage"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 15,
+  "fields": {
+    "name": "Hiking"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 16,
+  "fields": {
+    "name": "Outback"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 17,
+  "fields": {
+    "name": "Government"
+  }
+},
+{
+  "model": "posts.category",
+  "pk": 18,
+  "fields": {
+    "name": "Lake"
+  }
+},
+{
+  "model": "posts.post",
+  "pk": 9,
+  "fields": {
+    "author": 1,
+    "title": "Luna Park Sydney",
+    "content": "懷舊風格主題樂園，地標摩天輪",
+    "location": 1,
+    "category": 8,
+    "address": "",
+    "created_at": "2025-05-09T05:21:57.779Z"
+  }
+},
+{
+  "model": "posts.post",
+  "pk": 10,
+  "fields": {
+    "author": 1,
+    "title": "Taronga Zoo",
+    "content": "可俯瞰雪梨港的山坡動物園",
+    "location": 1,
+    "category": 9,
+    "address": "Bradleys Head Rd, Mosman NSW 2088",
+    "created_at": "2025-05-09T05:28:50.847Z"
+  }
+},
+{
+  "model": "posts.post",
+  "pk": 11,
+  "fields": {
+    "author": 1,
+    "title": "Darling Harbour",
+    "content": "結合水族館、商店與娛樂的港區",
+    "location": 1,
+    "category": 5,
+    "address": "Darling Harbour, Sydney NSW",
+    "created_at": "2025-05-09T06:26:59.188Z"
+  }
+},
+{
+  "model": "posts.post",
+  "pk": 12,
+  "fields": {
+    "author": 1,
+    "title": "Sea Life Sydney Aquarium",
+    "content": "展示大堡礁與海洋生物",
+    "location": 1,
+    "category": 9,
+    "address": "1-5 Wheat Rd, Sydney NSW 2000",
+    "created_at": "2025-05-09T06:27:41.573Z"
+  }
+},
+{
+  "model": "posts.photo",
+  "pk": 4,
+  "fields": {
+    "post": 9,
+    "image": "post_photos/Luna_Park_Sydney.jpeg"
+  }
+},
+{
+  "model": "posts.comment",
+  "pk": 2,
+  "fields": {
+    "post": 12,
+    "author": 1,
+    "content": "hi",
+    "created_at": "2025-05-09T06:29:29.853Z"
+  }
+},
+{
+  "model": "posts.comment",
+  "pk": 3,
+  "fields": {
+    "post": 12,
+    "author": 1,
+    "content": "hh",
+    "created_at": "2025-05-09T06:36:00.131Z"
+  }
+},
+{
+  "model": "posts.comment",
+  "pk": 5,
+  "fields": {
+    "post": 12,
+    "author": 1,
+    "content": "gg",
+    "created_at": "2025-05-09T15:22:26.751Z"
+  }
+},
+{
+  "model": "posts.userprofile",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "avatar": "avatars/IMG_1451.jpeg"
+  }
+}
+]

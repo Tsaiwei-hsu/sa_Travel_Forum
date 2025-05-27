@@ -1,0 +1,107 @@
+{% extends 'posts/base.html' %}
+{% load custom_filters %}
+{% block title %}選擇州{% endblock %}
+
+{% block content %}
+<style>
+  .location-box {
+    position: relative;
+    background-color: #aaaaaa;
+    border-radius: 2rem;
+    padding: 2rem;
+    color: white;
+    max-width: 500px;
+    margin: 3rem auto;
+  }
+
+  .location-box h2 {
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 2rem;
+  }
+
+  .location-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .state-link {
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+
+  .hover-wrapper {
+    display: inline-block;
+    position: relative;
+  }
+
+  .hover-wrapper a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.2s, background-color 0.2s;
+    padding: 4px 8px;
+    display: inline-block;
+    border-radius: 4px;
+  }
+
+  .hover-wrapper a:hover {
+    background-color: #777;
+    color: #dfdccc;
+  }
+
+  .preview-box {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 105%;
+    transform: translateY(-50%);
+    background-color: #fefefe;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 10px 12px;
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    z-index: 100;
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
+
+  .hover-wrapper:hover .preview-box {
+    display: block;
+  }
+
+  .preview-box ul {
+    padding-left: 20px;
+    margin: 0;
+  }
+</style>
+
+<div class="location-box">
+  <h2>選擇州</h2>
+  <ul>
+    {% for state in states %}
+      <li class="state-link">
+        <div class="hover-wrapper">
+          <a href="{% url 'filter_by_state' state.id %}">{{ state.name }}</a>
+          {% with location_cities|get_item:state.name as cities %}
+            {% if cities %}
+              <div class="preview-box">
+                <strong>城市：</strong>
+                <ul>
+                  {% for city in cities %}
+                    <li>{{ city }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+          {% endwith %}
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

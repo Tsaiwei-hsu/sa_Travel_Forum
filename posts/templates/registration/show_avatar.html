@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>顯示大頭照</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            padding: 50px;
+            background-color: #f0f0f0;
+        }
+        img {
+            border-radius: 50%;
+            border: 3px solid #3498db;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h2>你的大頭照已上傳成功！</h2>
+    <img src="{{ avatar_url }}" alt="你的大頭照">
+    <br><br>
+    <a href="{% url 'upload_avatar' %}">重新上傳</a>
+</body>
+</html>
