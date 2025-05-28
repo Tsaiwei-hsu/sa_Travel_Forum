@@ -3,7 +3,6 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
-from posts.views import CustomPasswordChangeView
 
 urlpatterns = [
     # 首頁（地圖首頁）
@@ -32,7 +31,6 @@ urlpatterns = [
 
     # 個人資料與頭像
     path('profile/', views.profile, name='profile'),                       # 使用者個人資料頁
-    path('password_change/', CustomPasswordChangeView.as_view(), name='password_change'),
 
     # 分類與篩選功能
     path('location/<int:location_id>/', views.filter_by_location, name='filter_by_location'),  # 地點篩選

@@ -138,7 +138,7 @@
       </div>
   
       <div style="background: #fffbea; padding: 10px 14px; margin-bottom: 18px; border-left: 4px solid #f1c40f; border-radius: 8px; color: #333;">
-        📸 照片若需刪除，請先儲存草稿再刪除。謝謝
+        📸 照片若需刪除，請先update再刪除。謝謝
       </div> 
       <form method="POST" enctype="multipart/form-data" class="post-form">
         {% csrf_token %}
@@ -194,8 +194,8 @@
       
         <!-- 提交 -->
         <div style="display: flex; gap: 12px; margin-top: 20px;">
-          <button type="submit" class="update-btn">更新</button>
-          <a href="{% url 'post_detail' post.pk %}" class="cancel-btn">取消</a>
+          <button type="submit" class="update-btn">update</button>
+          <a href="{% url 'post_detail' post.pk %}" class="cancel-btn">cancel</a>
         </div>
       </form>
       

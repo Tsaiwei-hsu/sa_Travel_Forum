@@ -280,12 +280,3 @@ def delete_comment(request, comment_id):
     comment.delete()
     messages.success(request, "留言已刪除")
     return redirect('post_detail', pk=post_id)
-
-class CustomPasswordChangeView(PasswordChangeView):
-    template_name = 'registration/password_change_form.html'  # 要吃你自己的 HTML
-    success_url = reverse_lazy('profile')
-
-    def form_valid(self, form):
-        messages.success(self.request, "密碼已更新！")
-        return super().form_valid(form)
-
