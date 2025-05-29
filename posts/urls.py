@@ -3,6 +3,7 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
+from .views import MyPasswordChangeView
 
 urlpatterns = [
     # 首頁（地圖首頁）
@@ -27,7 +28,9 @@ urlpatterns = [
     # 使用者帳號功能
     path('signup/', views.signup, name='signup'),                          # 註冊
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),  # 登出
+    path('accounts/password_change/', MyPasswordChangeView.as_view(), name='password_change'),
     path('accounts/', include('django.contrib.auth.urls')),                # Django 內建登入/密碼變更等
+    
 
     # 個人資料與頭像
     path('profile/', views.profile, name='profile'),                       # 使用者個人資料頁
