@@ -184,15 +184,19 @@ def delete_photo(request, photo_id):
     return JsonResponse({'status': 'success'})
 
 # 刪除貼文
-@login_required
 def delete_post(request, pk):
     post = get_object_or_404(Post, pk=pk, author=request.user)
-    if post.is_draft:
+
+    if request.method == 'POST':
         post.delete()
-        messages.success(request, "草稿已刪除")
-        return redirect('/profile/?section=drafts')
+        if post.is_draft:
+            messages.success(request, "草稿已刪除")
+            return redirect('/profile/?section=drafts')
+        else:
+            messages.success(request, "貼文已刪除")
+            return redirect('/profile/?section=published')
     else:
-        messages.error(request, "無法刪除已發佈的貼文")
+        messages.error(request, "刪除失敗：必須透過 POST 請求")
         return redirect('post_detail', pk=pk)
 
 # 單篇詳情

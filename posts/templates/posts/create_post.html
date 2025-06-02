@@ -51,6 +51,19 @@
       margin-bottom: 12px;
     }
 
+    .input-box.error, select.input-box.error {
+      border: 2px solid #e74c3c;
+      background: #fff6f6;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      font-size: 15px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      text-align: left;
+    }
+
     textarea.input-box {
       height: 100px;
       resize: vertical;
@@ -128,6 +141,10 @@
     {% endfor %}
   {% endif %}
 
+  {% if form.errors %}
+    {# 不顯示錯誤訊息，只保留紅框 #}
+  {% endif %}
+
   <div style="background: #fffbea; padding: 10px 14px; margin-bottom: 18px; border-left: 4px solid #f1c40f; border-radius: 8px; color: #333;">
     📸 照片若需刪除，請先儲存草稿再刪除。謝謝
   </div> 
@@ -135,24 +152,24 @@
     {% csrf_token %}
 
     <!-- 各欄位 -->
-    <input type="text" name="title" class="input-box" placeholder="標題" value="{{ form.title.value|default_if_none:'' }}">
-    <textarea name="content" class="input-box" placeholder="內容">{{ form.content.value|default_if_none:'' }}</textarea>
+    <input type="text" name="title" class="input-box{% if form.title.errors %} error{% endif %}" placeholder="標題" value="{{ form.title.value|default_if_none:'' }}">
+    <textarea name="content" class="input-box{% if form.content.errors %} error{% endif %}" placeholder="內容">{{ form.content.value|default_if_none:'' }}</textarea>
 
-    <select name="location" class="input-box">
+    <select name="location" class="input-box{% if form.location.errors %} error{% endif %}">
       <option value="">選擇地點</option>
       {% for loc in locations %}
         <option value="{{ loc.id }}" {% if form.location.value|stringformat:"s" == loc.id|stringformat:"s" %}selected{% endif %}>{{ loc.name }}</option>
       {% endfor %}
     </select>
 
-    <select name="category" class="input-box">
+    <select name="category" class="input-box{% if form.category.errors %} error{% endif %}">
       <option value="">選擇分類</option>
       {% for cat in categories %}
         <option value="{{ cat.id }}" {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
       {% endfor %}
     </select>
 
-    <input type="text" name="address" class="input-box" placeholder="地址" value="{{ form.address.value|default_if_none:'' }}">
+    <input type="text" name="address" class="input-box{% if form.address.errors %} error{% endif %}" placeholder="地址" value="{{ form.address.value|default_if_none:'' }}">
 
     <!-- 多圖上傳 -->
     <div class="file-upload">

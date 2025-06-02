@@ -463,6 +463,18 @@
 
     <!-- 主內容：貼文列表 -->
     <div class="main-content">
+      <!-- 成功訊息提示（置於主內容最上方） -->
+      {% if messages %}
+        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+          <div style="max-width: 700px; width: 100%;">
+            {% for message in messages %}
+              <div class="alert alert-success" style="font-size: 1.1rem; border-radius: 10px; margin-bottom: 10px;">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
       <div class="header">
         <h2>所有貼文</h2>
       </div>

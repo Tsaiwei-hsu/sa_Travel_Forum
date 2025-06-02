@@ -108,21 +108,26 @@
 
   <!-- 主內容 -->
   <main class="container mt-4">
-
-    <!-- 成功訊息提示 -->
-    {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endfor %}
-    {% endif %}
-
     {% block content %}{% endblock %}
   </main>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
+<script>
+  // 所有主內容區塊中的 messages（避免影響側欄、導航）
+  setTimeout(function () {
+    document.querySelectorAll('.main-content .alert.fade.show').forEach(function (alert) {
+      alert.classList.remove('show'); // 觸發 Bootstrap 淡出動畫
+    });
+  }, 3000); // 所有訊息 3 秒後淡出，可調整秒數
+
+  setTimeout(function () {
+    document.querySelectorAll('.main-content .alert.fade:not(.show)').forEach(function (alert) {
+      alert.remove(); // 再等 2 秒，從畫面刪除
+    });
+  }, 5000);
+</script>
 </html>
+
