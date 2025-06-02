@@ -122,6 +122,19 @@
 </head>
 <body>
 <div class="post-container">
+  {% if messages %}
+    <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+      <div style="max-width: 700px; width: 100%;">
+        {% for message in messages %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
   <div class="post-header">
     {% if user.userprofile.avatar %}
       <img src="{{ user.userprofile.avatar.url }}" class="avatar">
