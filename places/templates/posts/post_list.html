@@ -6,24 +6,99 @@
   /* 外框樣式 */
   .frame {
     position: relative;
-    margin: 20px auto;
+    margin: 40px auto 30px auto;
     padding: 15px;
-    max-width: 1000px;
-    border: 2px solid #999;
-    border-radius: 8px;
-    background: #f9f9f9;
+    width: 100%;
+    max-width: 1200px;
+    min-width: 320px;
+    height: 540px; /* 恢復較小的固定高度，依需求可再調整 */
+    border: 1px solid #bbb;
+    border-radius: 18px;
+    background: #fff;
+    box-sizing: border-box;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  @media (min-width: 1200px) {
+    .frame {
+      max-width: 1200px;
+      margin: 40px auto 30px auto;
+    }
+  }
+  @media (max-width: 1000px) {
+    .frame {
+      width: 98vw;
+      min-width: 0;
+      padding: 5vw 2vw;
+    }
+  }
+  @media (max-width: 900px) {
+    .frame {
+      height: 60vh;
+      max-width: 100vw;
+      min-width: 0;
+      padding: 8px;
+      border-radius: 10px;
+      margin: 20px 4px 20px 4px;
+    }
+    .container {
+      flex-direction: column;
+      height: 100%;
+    }
+    .main-content {
+      height: 100%;
+      max-height: 100%;
+      padding: 6px 0 0 0;
+    }
+    .post-preview-list {
+      height: 100%;
+      max-height: 100%;
+    }
+  }
+  @media (max-width: 700px) {
+    .frame {
+      width: 100vw;
+      min-width: 0;
+      max-width: 100vw;
+      height: 60vh;
+      margin: 0;
+      border-radius: 0;
+      padding: 0;
+    }
+    .main-content {
+      width: 100vw;
+      height: 100%;
+      max-height: 100%;
+      padding: 2vw;
+    }
+    .post-preview-list {
+      height: 100%;
+      max-height: 100%;
+    }
   }
 
   /* 主內容容器：左右分欄 */
   .container {
+    flex: 1 1 0%;
     display: flex;
+    min-height: 0;
+    height: 100%;
   }
 
   /* 側邊欄樣式 */
   .sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* 桌機時不吸底 */
     width: 200px;
     padding: 10px;
     border-right: 1px solid #ccc;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: visible;
   }
 
   /* 側邊欄標題樣式 */
@@ -55,7 +130,15 @@
 
   /* 主內容區塊樣式 */
   .main-content {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0%;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    box-sizing: border-box;
+    overflow: hidden; /* 只讓內層滑動 */
     padding: 10px;
   }
 
@@ -114,10 +197,204 @@
 
   /* 內文貼文區捲動區塊 */
   .post-preview-list {
-    height: 500px;
+    flex: 1 1 0%;
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
     overflow-y: auto;
-    padding-right: 10px; 
+    padding-right: 10px;
     box-sizing: border-box;
+  }
+
+  /* 側邊欄地點清單區塊（只針對地點） */
+  .sidebar .location-list {
+    max-height: 180px;
+    overflow-y: hidden;
+    margin-bottom: 10px;
+    transition: max-height 0.2s;
+  }
+  .sidebar .location-list.expanded {
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  @media (max-width: 900px) {
+    .sidebar .location-list {
+      max-height: 120px;
+    }
+    .sidebar .location-list.expanded {
+      max-height: 40vh;
+      overflow-y: auto;
+    }
+  }
+  @media (max-width: 700px) {
+    .sidebar .location-list {
+      max-height: 80px;
+    }
+    .sidebar .location-list.expanded {
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+  }
+  /* 側邊欄類型清單區塊（只針對景點類型） */
+  .sidebar .category-section .category-list {
+    max-height: 180px;
+    overflow-y: auto;
+  }
+
+  .sidebar .category-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .sidebar .category-list button {
+    align-self: flex-start;
+    margin-left: 0;
+  }
+
+  /* 類型選單區塊不再強制貼齊左下 */
+  .sidebar .category-section {
+    margin-top: 0;
+  }
+
+  /* 地點與景點類型之間的分隔線（置中於兩個區塊） */
+  .sidebar .category-divider {
+    width: 100%;
+    height: 1px;
+    background: #e0e0e0;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    border: none;
+    position: relative;
+    left: 0;
+  }
+  .sidebar .location-list {
+    margin-bottom: 0;
+  }
+  /* 分隔線上下的標題間距恢復預設 */
+  .sidebar .category-section .category-title {
+    margin-top: 10px;
+  }
+
+  /* 框線底對齊「更多類型」按鈕，僅在小螢幕時吸底，桌機時正常流動 */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* 桌機時不吸底 */
+    width: 200px;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+  }
+  .category-section {
+    display: block; /* 桌機時正常流動 */
+    flex: none;
+    margin-top: 0;
+  }
+  .category-list button#toggle-more-categories {
+    margin-top: 12px;
+    align-self: flex-start;
+  }
+  @media (max-width: 1000px) {
+    .frame {
+      width: 98vw;
+      min-width: 0;
+      padding: 5vw 2vw;
+    }
+    .sidebar {
+      width: 140px;
+      padding: 4px;
+    }
+    .main-content {
+      padding: 4px;
+    }
+  }
+  @media (max-width: 900px) {
+    .frame {
+      height: 60vh;
+      max-width: 100vw;
+      min-width: 0;
+      padding: 8px;
+      border-radius: 10px;
+      margin: 20px 4px 20px 4px;
+    }
+    .container {
+      flex-direction: column;
+      height: 100%;
+    }
+    .main-content {
+      height: 100%;
+      max-height: 100%;
+      padding: 6px 0 0 0;
+    }
+    .post-preview-list {
+      height: 100%;
+      max-height: 100%;
+    }
+  }
+  @media (max-width: 700px) {
+    .frame {
+      width: 100vw;
+      min-width: 0;
+      max-width: 100vw;
+      height: 60vh;
+      margin: 0;
+      border-radius: 0;
+      padding: 0;
+    }
+    .main-content {
+      width: 100vw;
+      height: 100%;
+      max-height: 100%;
+      padding: 2vw;
+    }
+    .post-preview-list {
+      height: 100%;
+      max-height: 100%;
+    }
+  }
+
+  /* 讓「更多城市」按鈕樣式與「更多類型」一致 */
+  .sidebar .location-list button#toggle-more {
+    width: auto;
+    min-width: 90px;
+    margin-top: 12px;
+    margin-bottom: 0;
+    font-weight: normal;
+    background: transparent;
+    border: 1px solid #6c757d;
+    color: #495057;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    padding: 2px 12px;
+    box-shadow: none;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+  }
+  .sidebar .location-list button#toggle-more:hover {
+    background: #f3f3f3;
+    color: #007bff;
+    border-color: #007bff;
+  }
+  .sidebar .location-list button#toggle-more:active,
+  .sidebar .category-list button#toggle-more-categories:active {
+    background: #e3eafc;
+    color: #007bff;
+    border-color: #007bff;
+  }
+
+  /* 讓側邊欄內容在小螢幕下可滑動，確保「更多城市」按鈕永遠可見 */
+  @media (max-width: 900px) {
+    .sidebar {
+      overflow-y: auto;
+      max-height: 60vh;
+    }
+  }
+  @media (max-width: 700px) {
+    .sidebar {
+      overflow-y: auto;
+      max-height: 60vh;
+    }
   }
 </style>
 
@@ -127,10 +404,9 @@
 
     <!-- 側邊欄：城市與類型分類 -->
     <div class="sidebar">
-
       <!-- 城市選單 -->
-      <div class="category-title">地點</div>
-      <div class="category-list">
+      <div class="category-title">城市</div>
+      <div class="category-list location-list">
         {% for location in locations %}
           {% if location.name in "Sydney Melbourne Brisbane Perth" %}
             <a href="{% url 'post_list' %}?location={{ location.name }}"
@@ -139,7 +415,6 @@
             </a>
           {% endif %}
         {% endfor %}
-
         <!-- 更多城市 -->
         <div id="more-locations" style="display: none;">
           {% for location in locations %}
@@ -151,37 +426,38 @@
             {% endif %}
           {% endfor %}
         </div>
-
         <!-- 城市展開按鈕 -->
         <button id="toggle-more" class="btn btn-sm btn-outline-secondary mt-2">更多城市 ▼</button>
       </div>
-
-      <!-- 類型選單 -->
-      <div class="category-title">景點類型</div>
-      <div class="category-list">
-        {% for category in categories %}
-          {% if category.name in "Beaches Museums Parks Historical" %}
+      <div class="category-divider"></div>
+      <div class="category-section">
+        <div class="category-title">景點類型</div>
+        <div class="category-list" id="category-list">
+          {% for category in categories|slice:":4" %}
             <a href="{% url 'filter_by_category' category.id %}{% if selected_location %}?location={{ selected_location }}{% endif %}"
                class="{% if current_category == category.name %}active{% endif %}">
               {{ category.name }}
             </a>
-          {% endif %}
-        {% endfor %}
-
-        <!-- 更多類型 -->
-        <div id="more-categories" style="display: none;">
-          {% for category in categories %}
-            {% if category.name not in "Beaches Museums Parks Historical" %}
+          {% endfor %}
+          <div id="more-categories-1" style="display: none;">
+            {% for category in categories|slice:"4:10" %}
               <a href="{% url 'filter_by_category' category.id %}{% if selected_location %}?location={{ selected_location }}{% endif %}"
                  class="{% if current_category == category.name %}active{% endif %}">
                 {{ category.name }}
               </a>
-            {% endif %}
-          {% endfor %}
+            {% endfor %}
+          </div>
+          <div id="more-categories-2" style="display: none;">
+            {% for category in categories|slice:"10:" %}
+              <a href="{% url 'filter_by_category' category.id %}{% if selected_location %}?location={{ selected_location }}{% endif %}"
+                 class="{% if current_category == category.name %}active{% endif %}">
+                {{ category.name }}
+              </a>
+            {% endfor %}
+          </div>
+          <!-- 類型展開按鈕 -->
+          <button id="toggle-more-categories" class="btn btn-sm btn-outline-secondary mt-2">更多類型 ▼</button>
         </div>
-
-        <!-- 類型展開按鈕 -->
-        <button id="toggle-more-categories" class="btn btn-sm btn-outline-secondary mt-2">更多類型 ▼</button>
       </div>
     </div>
 
@@ -219,22 +495,40 @@
 <script>
   const toggleBtn = document.getElementById('toggle-more');
   const moreBlock = document.getElementById('more-locations');
+  const locationList = document.querySelector('.location-list');
   let expanded = false;
 
   toggleBtn.addEventListener('click', () => {
     expanded = !expanded;
     moreBlock.style.display = expanded ? 'block' : 'none';
     toggleBtn.textContent = expanded ? '收起 ▲' : '更多城市 ▼';
+    if (expanded) {
+      locationList.classList.add('expanded');
+    } else {
+      locationList.classList.remove('expanded');
+    }
   });
 
   const toggleCatBtn = document.getElementById('toggle-more-categories');
-  const moreCatBlock = document.getElementById('more-categories');
-  let catExpanded = false;
+  const moreCatBlock1 = document.getElementById('more-categories-1');
+  const moreCatBlock2 = document.getElementById('more-categories-2');
+  let catExpandStep = 0; // 0:收合, 1:4→10, 2:10→全部
 
   toggleCatBtn.addEventListener('click', () => {
-    catExpanded = !catExpanded;
-    moreCatBlock.style.display = catExpanded ? 'block' : 'none';
-    toggleCatBtn.textContent = catExpanded ? '收起 ▲' : '更多類型 ▼';
+    catExpandStep = (catExpandStep + 1) % 3;
+    if (catExpandStep === 1) {
+      moreCatBlock1.style.display = 'block';
+      moreCatBlock2.style.display = 'none';
+      toggleCatBtn.textContent = '更多類型 ▼';
+    } else if (catExpandStep === 2) {
+      moreCatBlock1.style.display = 'block';
+      moreCatBlock2.style.display = 'block';
+      toggleCatBtn.textContent = '收起 ▲';
+    } else {
+      moreCatBlock1.style.display = 'none';
+      moreCatBlock2.style.display = 'none';
+      toggleCatBtn.textContent = '更多類型 ▼';
+    }
   });
 </script>
 {% endblock %}
