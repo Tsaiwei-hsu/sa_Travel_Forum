@@ -71,8 +71,8 @@
     <div class="logo">TRAVEL🔍</div>
 
     <div class="nav-links">
-      <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">HOME</a> /
-      <a href="{% url 'post_list' %}" class="{% if 'posts' in request.path %}active{% endif %}">POST</a> /
+      <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">MAP</a> /
+      <a href="{% url 'post_list' %}" class="{% if 'posts' in request.path %}active{% endif %}">HOME</a> /
       <a href="{% url 'category_index' %}" class="{% if 'list' in request.path %}active{% endif %}">LIST</a>
     </div>
 
