@@ -13,9 +13,27 @@
 
   <style>
     body {
-      background: linear-gradient(135deg, #f8f6ff 0%, #ede7fa 50%, #c5bce4 100%, #e3f3fa 100%);
+      background: linear-gradient(to bottom, #f3f3f4 0%, #ede7fa 30%, #bcb4dd 100%);
+      background-attachment: fixed;
       margin: 0;
       font-family: Arial, sans-serif;
+    }
+
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1;
+      padding: 40px 20px;
     }
 
     .main-header {
@@ -23,10 +41,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 32px;
+      padding: 18px 30px;
       background-color: #c4b4f3;
       color: white;
-      font-weight: bold; 
       font-size: 1.25rem;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
@@ -53,31 +70,32 @@
     }
 
     .main-header .nav-links a:hover {
-      background-color: #7aa6d2;
-      color: white;
+      color: #a99fc2;
     }
 
     .main-header .nav-links a.active {
-      background-color: #979a9b;
+      background-color: #a99fc2;
       color: white !important;
+      border: 2px solid #a99fc2;
+      border-radius: 6px;
+      box-shadow: none;
     }
 
     .main-header .dropdown .profile-icon img {
-      width: 60px;
-      height: 60px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid white;
     }
 
     .dropdown-menu {
-      background-color: #f3e8ff;
       border-color: #d9c3ff;
     }
 
     .dropdown-menu .dropdown-item:hover {
-      background-color: #e0b3ff;
-      color: #4b0082;
+      background-color: #d6d2da;
+      color: #436ab6;
     }
 
     main {

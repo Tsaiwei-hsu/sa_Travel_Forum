@@ -15,6 +15,7 @@
     overflow-x: hidden;
     box-sizing: border-box;
     color: #000;
+    position: relative;
   }
 
   /* 地址欄位樣式 */
@@ -114,10 +115,35 @@
 .favorite-icon.favorited {
     color: gold;
 }
+
+.back-arrow {
+    display: inline-block;
+    margin-bottom: 20px;
+    text-decoration: none;
+    position: absolute;
+    right: 24px;
+    top: 24px;
+    z-index: 10;
+    background: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
+}
 </style>
 
 <!-- 貼文主區塊 -->
-<div class="post-container">
+<div class="post-container" style="position: relative;">
+  <!-- 回主頁箭頭 -->
+  <a href="{% url 'post_list' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
+     class="back-arrow" title="回首頁">
+    <span style="font-size: 1.5rem; color: #5b5b5b;">&#8592;</span>
+  </a>
+
   {% if messages %}
     <div style="display: flex; justify-content: center; margin-bottom: 20px;">
       <div style="max-width: 700px; width: 100%;">

@@ -130,7 +130,7 @@
 
   /* 滑過側邊連結變色 */
   .sidebar .category-list a:hover {
-    color: rgb(213, 168, 245);
+    color: rgb(80, 79, 80);
   }
 
   /* 當前選取樣式 */
@@ -186,7 +186,7 @@
 
   /* 浮動新增貼文按鈕 */
   .fab {
-  position: absolute; /* 改為相對於 .frame */
+  position: absolute; 
   bottom: 20px;
   right: 20px;
   width: 80px;
@@ -203,19 +203,19 @@
 }
 
 .post-card .text h4 a {
-  color: #a26cc4;
+  color: #665a6c;
   text-decoration: none;
 }
 
 .post-card .text h4 a:hover {
-  color: #665a6c;
+  color: #838599;
   text-decoration: underline;
 }
 
 
   /* 浮動按鈕 hover 效果 */
   .fab:hover {
-    background: #e7c2ec;
+    background: #bdbabd;
   }
 
   /* 內文貼文區捲動區塊 */
@@ -501,7 +501,7 @@
               <img src="{{ post.photos.first.image.url }}" alt="Post Photo">
             {% endif %}
             <div class="text">
-              <h4><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h4>
+              <h4><a href="{% url 'post_detail' post.pk %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}">{{ post.title }}</a></h4>
               <p><strong>{{ post.author }}</strong> - {{ post.created_at|date:"Y年n月j日 H:i" }}</p>
               <p>{{ post.content|truncatechars:60 }}</p>
             </div>
