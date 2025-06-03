@@ -4,25 +4,25 @@
 {% block content %}
 <style>
   /* 外框樣式 */
-  .frame {
-    position: relative;
-    margin: 40px auto 30px auto;
-    padding: 15px;
-    width: 100%;
-    max-width: 1200px; 
-    min-width: 600px;
-    min-height: 600px; /* 由 height 改為 min-height，讓內容可撐開 */
-    height: 600px;
-    aspect-ratio: 3/1;
-    border: 1px solid #bbb;
-    border-radius: 18px;
-    background: #fff;
-    box-sizing: border-box;
-    overflow: hidden; /* 強制最外圈不可滑動，防止出現滾動條 */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-  }
+ .frame {
+  position: relative;
+  margin: 40px auto 30px auto;
+  padding: 15px;
+  width: 100%;
+  max-width: 1300px; /* 加寬 */
+  min-width: 400px;
+  min-height: 600px;
+  border: 1px solid #bbb;
+  border-radius: 18px;
+  background: #fff;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+}
 
   html, body {
     height: 100%;
@@ -130,7 +130,7 @@
 
   /* 滑過側邊連結變色 */
   .sidebar .category-list a:hover {
-    color: blue;
+    color: rgb(213, 168, 245);
   }
 
   /* 當前選取樣式 */
@@ -186,23 +186,36 @@
 
   /* 浮動新增貼文按鈕 */
   .fab {
-    position: fixed;
-    bottom: 60px;
-    right: 80px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: #007bff;
-    color: #fff;
-    font-size: 2rem;
-    line-height: 56px;
-    text-align: center;
-    text-decoration: none;
-  }
+  position: absolute; /* 改為相對於 .frame */
+  bottom: 20px;
+  right: 20px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #e7c2ec;
+  color: #fff;
+  font-size: 3rem;
+  line-height: 80px;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease;
+}
+
+.post-card .text h4 a {
+  color: #a26cc4;
+  text-decoration: none;
+}
+
+.post-card .text h4 a:hover {
+  color: #665a6c;
+  text-decoration: underline;
+}
+
 
   /* 浮動按鈕 hover 效果 */
   .fab:hover {
-    background: #0056b3;
+    background: #e7c2ec;
   }
 
   /* 內文貼文區捲動區塊 */
