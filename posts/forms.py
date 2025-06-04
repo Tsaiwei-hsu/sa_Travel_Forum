@@ -9,12 +9,17 @@ from .models import Photo
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'content', 'location', 'category', 'address']
+        fields = ['title', 'content', 'location', 'category', 'address', 'rate_posta']
+        widgets = {
+            'rate_posta': forms.HiddenInput(),  # 前端用星星互動，實際用 hidden input
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.required = True  # 強制所有欄位必填
+            if field.label != '評分':
+                field.required = True  # 只讓 rate_posta 可不填
+        self.fields['rate_posta'].required = False
 
 # 支援多圖上傳的檔案元件
 class MultiFileInput(forms.ClearableFileInput):
@@ -24,12 +29,13 @@ class MultiFileInput(forms.ClearableFileInput):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['content']
+        fields = ['content', 'rate_comment']
         widgets = {
             'content': forms.Textarea(attrs={
                 'rows': 3,
                 'placeholder': '寫下你的留言…'
             }),
+            'rate_comment': forms.HiddenInput(),
         }
 
 # 自定義使用者註冊表單（加入 email）

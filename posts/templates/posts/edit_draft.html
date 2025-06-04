@@ -125,6 +125,17 @@
     .btn-danger { background-color: #d6d6d6; color: black; }
 
     .btn:hover { opacity: 0.9; }
+
+    /* 星星評分樣式 */
+    #star-rating {
+      font-size: 2rem;
+      color: #ffd700;
+      cursor: pointer;
+    }
+    #star-rating .star {
+      display: inline-block;
+      transition: color 0.2s;
+    }
   </style>
 </head>
 <body>
@@ -180,6 +191,17 @@
     </select>
 
     <input type="text" name="address" class="input-box" placeholder="地址" value="{{ form.address.value|default_if_none:'' }}">
+
+    <!-- 評分欄位 -->
+    <div style="margin-bottom: 16px;">
+      <label style="font-weight: bold; margin-bottom: 6px; display: block;">調整您的評分（可不填）：</label>
+      <div id="star-rating">
+        {% for i in "12345" %}
+          <span class="star" data-value="{{ forloop.counter }}">&#9733;</span>
+        {% endfor %}
+      </div>
+      <input type="hidden" name="rate_posta" id="rating-input" value="{{ form.rate_posta.value|default_if_none:'' }}">
+    </div>
 
     <!-- 多圖上傳 -->
     <div class="file-upload">
@@ -241,6 +263,26 @@
       }
     });
   });
+
+  // 新增星星互動功能
+  const stars = document.querySelectorAll('#star-rating .star');
+  const ratingInput = document.getElementById('rating-input');
+  let currentRating = parseInt(ratingInput.value) || 0;
+  function updateStars(rating) {
+    stars.forEach((star, idx) => {
+      star.style.color = idx < rating ? '#ffd700' : '#ccc';
+    });
+  }
+  stars.forEach((star, idx) => {
+    star.addEventListener('mouseenter', () => updateStars(idx + 1));
+    star.addEventListener('mouseleave', () => updateStars(currentRating));
+    star.addEventListener('click', () => {
+      currentRating = idx + 1;
+      ratingInput.value = currentRating;
+      updateStars(currentRating);
+    });
+  });
+  updateStars(currentRating);
 </script>
 </body>
 </html>

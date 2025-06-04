@@ -24,7 +24,8 @@ class Post(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)  
     address = models.CharField(max_length=255, blank=True)     
     created_at = models.DateTimeField(auto_now_add=True)       
-    is_draft = models.BooleanField(default=False) 
+    is_draft = models.BooleanField(default=False)
+    rate_posta = models.FloatField(null=True, blank=True, help_text="上傳者評分，可不填")
 
     def __str__(self):
         return self.title
@@ -40,6 +41,7 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    rate_comment = models.PositiveSmallIntegerField(null=True, blank=True, help_text="留言評分，可不填")
 
     def __str__(self):
         return f"Comment by {self.author} on {self.post}"

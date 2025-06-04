@@ -91,6 +91,7 @@ def create_post(request):
             location = request.POST.get('location')
             category = request.POST.get('category')
             address = request.POST.get('address', '').strip()
+            rate_posta = request.POST.get('rate_posta')
             if not (title or content or location or category or address):
                 messages.error(request, "請至少填寫一個欄位再儲存草稿！")
                 form = PostForm(request.POST)
@@ -105,6 +106,7 @@ def create_post(request):
             post.location_id = location or None
             post.category_id = category or None
             post.address = address
+            post.rate_posta = float(rate_posta) if rate_posta else None
             post.save()
             for img in request.FILES.getlist('images'):
                 Photo.objects.create(post=post, image=img)
@@ -116,6 +118,8 @@ def create_post(request):
                 post = form.save(commit=False)
                 post.author = request.user
                 post.is_draft = False
+                rate_posta = request.POST.get('rate_posta')
+                post.rate_posta = float(rate_posta) if rate_posta else None
                 post.save()
                 for img in request.FILES.getlist('images'):
                     Photo.objects.create(post=post, image=img)
@@ -141,7 +145,10 @@ def edit_post(request, pk):
     if request.method == 'POST':
         post_form = PostForm(request.POST, request.FILES, instance=post)
         if post_form.is_valid():
-            post = post_form.save()
+            post = post_form.save(commit=False)
+            rate_posta = request.POST.get('rate_posta')
+            post.rate_posta = float(rate_posta) if rate_posta else None
+            post.save()
             for img in request.FILES.getlist('images'):
                 Photo.objects.create(post=post, image=img)
             messages.success(request, "貼文更新成功！")
@@ -167,6 +174,8 @@ def edit_draft(request, pk):
         post_form = PostForm(request.POST, request.FILES, instance=post)
         if post_form.is_valid():
             post = post_form.save(commit=False)
+            rate_posta = request.POST.get('rate_posta')
+            post.rate_posta = float(rate_posta) if rate_posta else None
             if 'publish' in request.POST:
                 post.is_draft = False
             post.save()
@@ -222,12 +231,23 @@ def post_detail(request, pk):
     comments = post.comments.all()
     user_favorites = Favorite.objects.filter(user=request.user).values_list('post_id', flat=True) if request.user.is_authenticated else []
 
+    # 平均留言評分（只計算有評分的留言）
+    rated_comments = [c for c in comments if c.rate_comment]
+    if rated_comments:
+        avg_comment_rating = round(sum(c.rate_comment for c in rated_comments) / len(rated_comments), 2)
+    else:
+        avg_comment_rating = None
+
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.post = post
             comment.author = request.user
+            # 額外處理 rate_comment
+            rate_comment = request.POST.get('rating') or request.POST.get('rate_comment')
+            if rate_comment:
+                comment.rate_comment = int(rate_comment)
             comment.save()
             return redirect('post_detail', pk=post.pk)
     else:
@@ -238,6 +258,7 @@ def post_detail(request, pk):
         'comments': comments,
         'form': form,
         'user_favorites': user_favorites,
+        'avg_comment_rating': avg_comment_rating,
     })
 
 # 貼文列表
@@ -304,8 +325,8 @@ def delete_comment(request, comment_id):
 
 
 class MyPasswordChangeView(PasswordChangeView):
-    template_name = 'registration/change_password.html'  # 自訂畫面
-    success_url = reverse_lazy('profile')  # 自訂成功後跳轉（換成你想跳的頁面）
+    template_name = 'registration/change_password.html'  
+    success_url = reverse_lazy('profile')  
 
     def form_valid(self, form):
         messages.success(self.request, '密碼已成功修改')

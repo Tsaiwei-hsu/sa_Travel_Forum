@@ -19,15 +19,12 @@
 
     .post-container {
       background: #ffffff;
-      width: 600px;
-      padding: 30px 40px;
+      width: 700px;
+      padding: 15px 45px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       margin: 100px auto;
     }
-
-
-
 
     .post-header {
       display: flex;
@@ -156,6 +153,18 @@
         {% endfor %}
       </div>
     </div>
+    <script>
+      // 自動隱藏訊息 3 秒（同時隱藏所有 .alert-success 與 style 內的 message 區塊）
+      setTimeout(function() {
+        document.querySelectorAll('.alert-success, [style*="border-left: 4px solid #4a90e2"]').forEach(function(el) {
+          el.style.display = 'none';
+        });
+        // 移除紅色錯誤框
+        document.querySelectorAll('.input-box.error, select.input-box.error').forEach(function(el) {
+          el.classList.remove('error');
+        });
+      }, 3000);
+    </script>
   {% endif %}
 
   <div class="post-header">
@@ -177,7 +186,7 @@
     {% endfor %}
   {% endif %}
 
-  {% if form.errors %}
+  {% if form.errors and not request.POST %}
     {# 不顯示錯誤訊息，只保留紅框 #}
   {% endif %}
 
@@ -206,6 +215,37 @@
     </select>
 
     <input type="text" name="address" class="input-box{% if form.address.errors %} error{% endif %}" placeholder="地址" value="{{ form.address.value|default_if_none:'' }}">
+
+    <!-- 評分欄位 -->
+    <div style="margin-bottom: 16px;">
+      <div id="star-rating" style="font-size: 2rem; color: #ffd700; cursor: pointer;">
+        {% for i in "12345" %}
+          <span class="star" data-value="{{ forloop.counter }}">&#9733;</span>
+        {% endfor %}
+      </div>
+      <input type="hidden" name="rate_posta" id="rating-input" value="{{ form.rate_posta.value|default_if_none:'' }}">
+      <script>
+        // 星星評分互動
+        const stars = document.querySelectorAll('#star-rating .star');
+        const ratingInput = document.getElementById('rating-input');
+        let currentRating = parseInt(ratingInput.value) || 0;
+        function updateStars(rating) {
+          stars.forEach((star, idx) => {
+            star.style.color = idx < rating ? '#ffd700' : '#ccc';
+          });
+        }
+        stars.forEach((star, idx) => {
+          star.addEventListener('mouseenter', () => updateStars(idx + 1));
+          star.addEventListener('mouseleave', () => updateStars(currentRating));
+          star.addEventListener('click', () => {
+            currentRating = idx + 1;
+            ratingInput.value = currentRating;
+            updateStars(currentRating);
+          });
+        });
+        updateStars(currentRating);
+      </script>
+    </div>
 
     <!-- 多圖上傳 -->
     <div class="file-upload">
