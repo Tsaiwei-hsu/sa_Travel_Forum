@@ -7,12 +7,14 @@
   <link rel="stylesheet" href="{% static 'style.css' %}">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f2f4f8;
-      padding: 40px 0;
-      display: flex;
-      justify-content: center;
-    }
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(to bottom, #f3f3f4 0%, #ede7fa 30%, #bcb4dd 100%);
+        background-attachment: fixed;
+        margin: 0;
+        padding: 40px 0;
+        display: flex;
+        justify-content: center;
+      }
 
     .post-container {
       background: #ffffff;
@@ -202,7 +204,7 @@
     <div class="button-group">
       <button type="submit" name="save_draft" class="btn btn-secondary">儲存草稿</button>
       <button type="submit" name="publish" class="btn btn-primary">立即發佈</button>
-      <a href="{% url 'post_detail' post.pk %}" class="btn btn-danger">取消修改</a>
+      <a href="{% url 'profile' %}?section=drafts" class="btn btn-danger">取消修改</a>
     </div>
   </form>
 </div>

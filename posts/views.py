@@ -84,28 +84,45 @@ def create_post(request):
         if 'cancel' in request.POST:
             return redirect('post_list')
 
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-
-            # 草稿或發佈判斷
-            if 'save_draft' in request.POST:
-                post.is_draft = True
-                post.save()
-                for img in request.FILES.getlist('images'):
-                    Photo.objects.create(post=post, image=img)
-                messages.success(request, "草稿已儲存！")
-                return redirect('/profile/?section=drafts')
-            else:
+        if 'save_draft' in request.POST:
+            # 草稿允許空欄位，但至少要填一個欄位
+            title = request.POST.get('title', '').strip()
+            content = request.POST.get('content', '').strip()
+            location = request.POST.get('location')
+            category = request.POST.get('category')
+            address = request.POST.get('address', '').strip()
+            if not (title or content or location or category or address):
+                messages.error(request, "請至少填寫一個欄位再儲存草稿！")
+                form = PostForm(request.POST)
+                return render(request, 'posts/create_post.html', {
+                    'form': form,
+                    'locations': Location.objects.all(),
+                    'categories': Category.objects.all(),
+                })
+            post = Post(author=request.user, is_draft=True)
+            post.title = title
+            post.content = content
+            post.location_id = location or None
+            post.category_id = category or None
+            post.address = address
+            post.save()
+            for img in request.FILES.getlist('images'):
+                Photo.objects.create(post=post, image=img)
+            messages.success(request, "草稿已儲存！")
+            return redirect('/profile/?section=drafts')
+        else:
+            form = PostForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
                 post.is_draft = False
                 post.save()
                 for img in request.FILES.getlist('images'):
                     Photo.objects.create(post=post, image=img)
                 messages.success(request, "貼文已發佈！")
                 return redirect('post_list')
-        else:
-            messages.error(request, "表單錯誤，請確認欄位")
+            else:
+                messages.error(request, "表單錯誤，請確認欄位")
     else:
         form = PostForm()
 
