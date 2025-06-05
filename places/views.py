@@ -1,5 +1,4 @@
-from django.contrib.auth.decorators import user_passes_test
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from .models import State, City, Category, Post
 
 # 首頁 view
@@ -67,27 +66,3 @@ def filter_by_category(request, category_id):
 # 上傳貼文的頁面（表單）
 def post_upload(request):
     return render(request, 'posts/post_upload.html')
-
-def is_admin(user):
-    return user.is_staff or user.is_superuser
-
-# 新增：待审核贴文列表
-@user_passes_test(is_admin)
-def review_posts(request):
-    posts = Post.objects.filter(is_approved=False)
-    return render(request, 'places/review_posts.html', {'posts': posts})
-
-# 新增：通过审核
-@user_passes_test(is_admin)
-def approve_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    post.is_approved = True
-    post.save()
-    return redirect('review_posts')
-
-# 新增：拒绝（删除）贴文
-@user_passes_test(is_admin)
-def reject_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    post.delete()
-    return redirect('review_posts')

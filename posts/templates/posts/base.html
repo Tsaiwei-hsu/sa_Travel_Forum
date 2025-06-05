@@ -2,98 +2,229 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  
-  <!-- 頁面標題區塊（可被子模板覆蓋） -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}Travel Forum{% endblock %}</title>
 
-  <!-- 載入 Bootstrap 樣式與自訂 CSS -->
+  <!-- Bootstrap + Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- 全站通用內嵌樣式 -->
+
   <style>
     body {
-      background-color: #f8f9fa;
+      background: linear-gradient(to bottom, #f3f3f4 0%, #ede7fa 30%, #bcb4dd 100%);
+      background-attachment: fixed;
       margin: 0;
       font-family: Arial, sans-serif;
     }
 
-    /* 頁面頂部導覽列 */
+    .star {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: transparent;
+      color:rgb(248, 241, 202);
+      font-size: 14px;
+      pointer-events: none;
+      animation: twinkleStar 2.5s infinite ease-in-out;
+      z-index: 0;
+    }
+    
+    @keyframes twinkleStar {
+      0%, 100% {
+        opacity: 0.9;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.2;
+        transform: scale(1.3);
+      }
+    }
+    
+    .star:nth-child(odd) {
+      font-size: 12px;
+    }
+    
+    .star:nth-child(even) {
+      font-size: 16px;
+      opacity: 0.5;
+      animation-delay: 0.5s;
+    }
+
+    .star-floating {
+      position: fixed;
+      font-size: 18px;
+      color: #fff7cc;
+      opacity: 0.7;
+      animation: floatStar 8s ease-in-out infinite alternate, twinkleStar 2.5s infinite ease-in-out;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    @keyframes floatStar {
+      0% {
+        transform: translate(0, 0);
+      }
+      100% {
+        transform: translate(30px, -20px);
+      }
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    main {
+      flex: 1;
+      padding: 40px 20px;
+      overflow: visible;
+    }
+
     .main-header {
+    
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 20px;
-      border-bottom: 1px solid #ccc;
+      padding: 18px 30px;
+      background-color: #c4b4f3;
+      color: white;
+      font-size: 1.25rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 9;
     }
 
-    /* LOGO 區塊 */
     .main-header .logo {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: bold;
       display: flex;
       align-items: center;
     }
 
     .main-header .logo img {
-      vertical-align: middle;
       width: 20px;
-      margin-left: 5px;
+      margin-left: 6px;
     }
 
-    /* 導覽連結樣式 */
     .main-header .nav-links a {
       margin: 0 10px;
       text-decoration: none;
-      color: #333;
+      color: #fdfcfa;
       padding: 6px 12px;
       border-radius: 6px;
       transition: background-color 0.3s, color 0.3s;
     }
 
-    /* 滑過導覽連結變色 */
     .main-header .nav-links a:hover {
-      color: #c6c0a4;
+      color: #a99fc2;
     }
 
-    /* 當前頁面導覽標記 */
     .main-header .nav-links a.active {
-      background-color: #747475;
+      background-color: #a99fc2;
       color: white !important;
+      border: 2px solid #a99fc2;
+      border-radius: 6px;
+      box-shadow: none;
     }
 
-    /* 使用者頭像樣式 */
     .main-header .dropdown .profile-icon img {
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       object-fit: cover;
+      border: 2px solid white;
+    }
+
+    .dropdown-menu {
+      border-color: #d9c3ff;
+    }
+
+    .dropdown-menu .dropdown-item:hover {
+      background-color: #d6d2da;
+      color: #436ab6;
+    }
+
+    main {
+      padding: 40px 20px;
+    }
+
+    .post-card,
+    .profile-container,
+    .post-item,
+    .post-horizontal {
+      position: relative;
+      z-index: 1;
+    }
+
+    .frame {
+      overflow: unset;
+      max-height: none;
     }
   </style>
 </head>
-<body>
 
-  <!-- Bootstrap 套件 JS 功能（例如下拉選單） -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <body data-authenticated="{{ user.is_authenticated }}">
+<body data-authenticated="{{ user.is_authenticated }}">
+  <!-- 星星裝飾（移到 header 之前，確保在背景且可隨頁面滾動） -->
+  <span class="star" style="top: 40px; left: 80px;">★</span>
+  <span class="star" style="top: 90px; left: 250px;">★</span>
+  <span class="star" style="top: 120px; left: 700px;">★</span>
+  <span class="star" style="top: 300px; left: 180px;">★</span>
+  <span class="star" style="top: 200px; left: 500px;">★</span>
+  <span class="star" style="top: 400px; left: 800px;">★</span>
+  <span class="star" style="top: 450px; left: 100px;">★</span>
+  <span class="star" style="top: 50px; left: 600px;">★</span>
+  <span class="star" style="top: 250px; left: 380px;">★</span>
+  <span class="star" style="top: 480px; left: 720px;">★</span>
+  <span class="star" style="top: 520px; left: 300px;">★</span>
+  <span class="star" style="top: 350px; left: 950px;">★</span>
+  <span class="star" style="top: 120px; left: 1000px;">★</span>
+  <span class="star" style="top: 80px; left: 1150px;">★</span>
+  <span class="star" style="top: 500px; left: 1100px;">★</span>
+  <span class="star" style="top: 600px; left: 200px;">★</span>
+  <span class="star" style="top: 640px; left: 400px;">★</span>
+  <span class="star" style="top: 680px; left: 850px;">★</span>
+  <span class="star" style="top: 720px; left: 1050px;">★</span>
+  <span class="star" style="top: 50px; left: 1280px;">★</span>
+  <span class="star" style="top: 250px; left: 1350px;">★</span>
+  <span class="star" style="top: 400px; left: 1420px;">★</span>
+  <span class="star" style="top: 580px; left: 1500px;">★</span>
+  <span class="star" style="top: 680px; left: 300px;">★</span>
+  <span class="star" style="top: 720px; left: 650px;">★</span>
+  <span class="star" style="top: 760px; left: 900px;">★</span>
+  <span class="star" style="top: 800px; left: 1150px;">★</span>
+  <span class="star" style="top: 840px; left: 1350px;">★</span>
+  <span class="star" style="top: 880px; left: 1550px;">★</span>
+  <!-- 飄動星星 -->
+  <span class="star-floating" style="top: 100px; left: 200px;">★</span>
+  <span class="star-floating" style="top: 250px; left: 800px;">★</span>
+  <span class="star-floating" style="top: 400px; left: 1300px;">★</span>
+  <span class="star-floating" style="top: 600px; left: 100px;">★</span>
+  <span class="star-floating" style="top: 750px; left: 600px;">★</span>
+  <span class="star-floating" style="top: 900px; left: 1200px;">★</span>
 
-  <!-- 導覽列區塊 -->
+
   <header class="main-header">
-    <!-- LOGO -->
-    <div class="logo">
-      TRAVEL🔍
-    </div>
+    <div class="logo">TRAVEL🔍</div>
 
-    <!-- 導覽連結 -->
     <div class="nav-links">
-      <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">HOME</a> /
-      <a href="{% url 'post_list' %}" class="{% if 'posts' in request.path %}active{% endif %}">POST</a> /
+      <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">MAP</a> /
+      <a href="{% url 'post_list' %}" class="{% if 'posts' in request.path %}active{% endif %}">HOME</a> /
       <a href="{% url 'category_index' %}" class="{% if 'list' in request.path %}active{% endif %}">LIST</a>
     </div>
 
-    <!-- 使用者帳號下拉選單 -->
     <div class="dropdown">
       <a class="btn dropdown-toggle profile-icon" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         {% if user.is_authenticated %}
@@ -107,7 +238,6 @@
         {% endif %}
       </a>
 
-      <!-- 下拉選單內容 -->
       <ul class="dropdown-menu dropdown-menu-end">
         {% if user.is_authenticated %}
           <li><a class="dropdown-item" href="{% url 'profile' %}">個人資料</a></li>
@@ -125,9 +255,23 @@
     </div>
   </header>
 
-  <!-- 主內容區塊，供其他頁面填入內容 -->
   <main>
     {% block content %}{% endblock %}
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
+<script>
+  setTimeout(function () {
+    document.querySelectorAll('.main-content .alert.fade.show').forEach(function (alert) {
+      alert.classList.remove('show');
+    });
+  }, 3000);
+  setTimeout(function () {
+    document.querySelectorAll('.main-content .alert.fade:not(.show)').forEach(function (alert) {
+      alert.remove();
+    });
+  }, 5000);
+</script>
 </html>

@@ -48,7 +48,7 @@
   }
 
   .post-item {
-    border: 1px solid #ddd;
+    border: 1px solid #787474;
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 20px;
@@ -147,8 +147,20 @@
 }
 
 </style>
-
 <div class="profile-container">
+  {% if messages %}
+    <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+      <div style="max-width: 700px; width: 100%;">
+        {% for message in messages %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
   <div class="profile-header">我的帳號資料</div>
 
   <form method="POST" enctype="multipart/form-data">
@@ -164,22 +176,31 @@
     <div class="form-group">
       <label for="id_avatar">頭貼：</label><br>
       {% if request.user.userprofile.avatar %}
-        <img src="{{ request.user.userprofile.avatar.url }}" width="100" style="border-radius: 50%;"><br><br>
+        <img id="avatarPreview" src="{{ request.user.userprofile.avatar.url }}" width="100" style="border-radius: 50%;"><br><br>
       {% else %}
-        <p style="color: gray;">尚未上傳頭像</p>
+        <img id="avatarPreview" src="{% static 'img/default_avatar.png' %}" width="100" style="border-radius: 50%;"><br><br>
       {% endif %}
       <input type="file" name="avatar" id="id_avatar">
     </div>
-    <button type="submit" class="submit-btn">儲存修改</button>
+    
+  
+    <div style="display: flex; gap: 12px;">
+      <button type="submit" class="submit-btn">儲存修改</button>
+      <a href="{% url 'profile' %}" class="submit-btn" style="background: #ddd; color: #333;">取消修改</a>
+    </div>
   </form>
-
+  <div style="margin-top: 20px; font-size: 0.9rem; color: gray;">
+    注意：修改使用者名稱或電子郵件可能會影響你的登入方式。
   <div class="change-password">
     <a href="{% url 'password_change' %}">更改密碼</a>
   </div>
 
+  <hr style="margin: 40px 0; border: none; border-top: 1px solid #6f6f6f;">
+
   <div style="margin-top: 40px;">
-    <button class="tab-button active" onclick="showSection('posts')">我發表的貼文</button>
-    <button class="tab-button" onclick="showSection('favorites')">我收藏的貼文</button>
+    <button class="tab-button active" onclick="showSection('posts', event)">我發表的貼文</button>
+    <button class="tab-button" onclick="showSection('favorites', event)">我收藏的貼文</button>
+    <button class="tab-button" onclick="showSection('drafts-section', event)">我的草稿</button>
   </div>
 
   <div id="posts" class="my-posts toggle-section" style="display: block;">
@@ -207,8 +228,9 @@
   </div>
   
 
-  <div id="favorites" class="my-posts toggle-section">
-    {% for fav in favorites %}
+<!-- 我的收藏 -->
+  <div id="favorites" class="my-posts toggle-section" style="display: none;">
+  {% for fav in favorites %}
       <div class="post-item">
         {% if fav.post.photos.all %}
           <img src="{{ fav.post.photos.all.0.image.url }}" alt="封面圖">
@@ -221,14 +243,82 @@
       <p>你尚未收藏任何貼文。</p>
     {% endfor %}
   </div>
+
+  <!-- 我的草稿 -->
+  <div id="drafts-section" class="my-posts toggle-section" style="display: none;">
+    {% if user_drafts %}
+      {% for draft in user_drafts %}
+        {% if draft.pk %}
+          <div class="post-item post-horizontal">
+            {% if draft.photos.all %}
+              <div class="post-image-wrapper">
+                <img src="{{ draft.photos.all.0.image.url }}" alt="封面圖">
+              </div>
+            {% endif %}
+            <div class="post-text">
+              <h4>{{ draft.title }}</h4>
+              <p>{{ draft.content|truncatewords:20 }}</p>
+  
+              <!-- 編輯草稿連結 -->
+              <a href="{% url 'edit_draft' draft.pk %}" class="update-btn">編輯</a>
+  
+              <!-- 刪除草稿按鈕 -->
+              <form method="POST" action="{% url 'delete_post' pk=draft.pk %}" onsubmit="return confirm('確定要刪除此草稿嗎？');" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="cancel-btn">刪除</button>
+              </form>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <p>你目前沒有草稿。</p>
+    {% endif %}
+  </div>  
 </div>
 
 <script>
-  function showSection(sectionId) {
+  function showSection(sectionId, event) {
     document.querySelectorAll('.toggle-section').forEach(el => el.style.display = 'none');
+
+    const selectedSection = document.getElementById(sectionId);
+    if (selectedSection) selectedSection.style.display = 'block';
+
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(sectionId).style.display = 'block';
-    event.target.classList.add('active');
+    if (event) event.target.classList.add('active');
   }
+
+  // ✅ 自動顯示後端指定的 section（如 drafts）
+  document.addEventListener('DOMContentLoaded', function () {
+    const section = "{{ section|default:'posts' }}";
+
+    // 顯示對應區塊
+    if (section === 'drafts') {
+      showSection('drafts-section');
+    } else if (section === 'favorites') {
+      showSection('favorites');
+    } else {
+      showSection('posts');
+    }
+
+    // 同步按鈕樣式
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(btn => {
+      if (btn.textContent.includes('草稿') && section === 'drafts') btn.classList.add('active');
+      else if (btn.textContent.includes('收藏') && section === 'favorites') btn.classList.add('active');
+      else if (btn.textContent.includes('發表') && section === 'posts') btn.classList.add('active');
+    });
+  });
+
+  // 預覽頭像
+  document.getElementById('id_avatar').addEventListener('change', function (event) {
+    const preview = document.getElementById('avatarPreview');
+    const file = event.target.files[0];
+    if (file) {
+      preview.src = URL.createObjectURL(file);
+    }
+  });
+
+
 </script>
 {% endblock %}

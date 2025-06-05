@@ -1,0 +1,12 @@
+<h2>待人工審核貼文</h2>
+{% for post in posts %}
+  <div style="border:1px solid #ccc; margin:10px; padding:10px;">
+    <h3>{{ post.title }}</h3>
+    <p>{{ post.content }}</p>
+    <p><strong>檢舉理由：</strong>{{ post.report_reason }}</p>
+    <a href="{% url 'manual_review_action' post.pk 'approve' %}">✔ 通過</a>
+    <a href="{% url 'manual_review_action' post.pk 'reject' %}">✖ 刪除</a>
+  </div>
+{% empty %}
+  <p>目前沒有待審核的貼文。</p>
+{% endfor %}

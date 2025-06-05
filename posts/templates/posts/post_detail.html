@@ -15,6 +15,8 @@
     overflow-x: hidden;
     box-sizing: border-box;
     color: #000;
+    position: relative;
+    z-index: 10;
   }
 
   /* 地址欄位樣式 */
@@ -75,6 +77,8 @@
   /* 留言區塊 */
   .comments {
     margin-top: 30px;
+    z-index: 10;
+    position: relative;
   }
 
   .comments .comment {
@@ -83,6 +87,11 @@
   }
 
   /* 留言表單樣式 */
+  .comment-form {
+    z-index: 10;
+    position: relative;
+  }
+
   .comment-form textarea {
     width: 100%;
     min-height: 80px;
@@ -114,10 +123,75 @@
 .favorite-icon.favorited {
     color: gold;
 }
+
+.back-arrow {
+    display: inline-block;
+    margin-bottom: 20px;
+    text-decoration: none;
+    position: absolute;
+    right: 24px;
+    top: 24px;
+    z-index: 10;
+    background: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
+}
+
+.favorite-icon {
+  font-size: 1.8rem;
+  color: rgb(114, 113, 113);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.favorite-icon.favorited {
+  color: #e38c94;
+}
+
+.favorite-btn:hover .favorite-icon {
+  color: #b09bb3;
+}
+
+.rating-star {
+  position: static !important;
+  font-size: 1.5em;
+  color: #ccc;
+  cursor: pointer;
+  user-select: none;
+  z-index: 20;
+  background: none;
+  animation: none;
+  display: inline-block;
+}
+
 </style>
 
 <!-- 貼文主區塊 -->
-<div class="post-container">
+<div class="post-container" style="position: relative;">
+  <!-- 回主頁箭頭 -->
+  <a href="{% url 'post_list' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
+     class="back-arrow" title="回首頁">
+    <span style="font-size: 1.5rem; color: #5b5b5b;">&#8592;</span>
+  </a>
+
+  {% if messages %}
+    <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+      <div style="max-width: 700px; width: 100%;">
+        {% for message in messages %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
 
   <!-- 使用者頭像與資訊 -->
   <div class="post-header">
@@ -128,12 +202,30 @@
     {% endif %}
     <div class="post-user-info">
       <strong>{{ post.author.username }}</strong> &gt; <em>View your post</em>
+      {% if post.rate_posta %}
+        <div style="margin-top: 4px; font-size: 1em; color: #ffc760; display: flex; align-items: center; gap: 2px;">
+          {% for i in "12345" %}
+            {% if post.rate_posta >= i|add:'0' %}
+              &#9733;
+            {% else %}
+              &#9734;
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
     </div>
   </div>
 
   <!-- 貼文內容 -->
   <div class="post-detail">
     <h2>{{ post.title }}</h2>
+
+    {% if post.takedown_reason %}
+      <div style="color:red; font-weight:bold;">
+        {{ post.takedown_reason }}
+      </div>
+    {% endif %}
+
     <p>{{ post.content }}</p>
     {% if post.address %}
       <p class="address"><strong>地址：</strong>{{ post.address }}</p>
@@ -151,20 +243,59 @@
     <!-- 發佈時間 -->
     <p>{{ post.created_at|date:"Y年n月j日 H:i" }}</p>
   </div>
-  <!-- 在 post_list.html 或 post_detail.html 中 -->
-  <button class="favorite-btn" data-post-id="{{ post.id }}">
-    <span class="favorite-icon {% if post.id in user_favorites %}favorited{% endif %}">★</span>
+
+    <!-- 收藏標籤按鈕 -->
+  <button class="favorite-btn" data-post-id="{{ post.id }}" style="background: none; border: none; cursor: pointer;">
+    <i class="fa-solid fa-tag favorite-icon {% if post.id in user_favorites %}favorited{% endif %}" style="font-size: 1.8rem;"></i>
   </button>
 
+  <hr style="margin: 18px 0; border: none; border-top: 1.5px solid #b8b4b4;">
 
-  <!-- 留言列表 -->
+  <!-- 留言區塊 -->
   <div class="comments">
-    <h3>留言</h3>
+    {# 平均留言評分顯示 #}
+    {% if comments %}
+      {% if avg_comment_rating %}
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 18px;">
+          <span style="color:#888; font-size:0.98em; margin-right: 4px;">平均</span>
+          <span style="font-size: 1.1em; color: #444; font-weight: bold; margin-right: 8px;">{{ avg_comment_rating|floatformat:1 }}</span>
+          <span style="font-size: 1.25em; color: #ffd700;">&#9733;</span>
+        </div>
+        <hr style="margin: 18px 0; border: none; border-top: 1.5px solid #e0e0e0;">
+      {% endif %}
+    {% endif %}
+
+    {# 單則留言 #}
     {% for comment in comments %}
-      <div class="comment">
-        <p><strong>{{ comment.author.username }}</strong> {{ comment.created_at|date:"Y年n月j日 H:i" }}</p>
-        <p>{{ comment.content }}</p>
-      </div>
+    <div class="comment" style="margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #ddd;">
+      <p style="margin: 0;">
+        <strong>{{ comment.author.username }}</strong>
+        <span style="color: #888; font-size: 0.9em;">{{ comment.created_at|date:"Y年n月j日 H:i" }}</span>
+      </p>
+      {# 只顯示有評分的留言星星 #}
+      {% if comment.rate_comment %}
+        <div style="margin: 2px 0 6px 0; font-size: 1.1em; display: flex; align-items: center; gap: 2px;">
+          {% for i in "12345" %}
+            {% if comment.rate_comment >= i|add:'0' %}
+              <span style="color:#ffd700;">&#9733;</span>
+            {% else %}
+              <span style="color:#ccc;">&#9734;</span>
+            {% endif %}
+          {% endfor %}
+          <span style="color:#888; font-size:0.95em;">({{ comment.rate_comment }}/5)</span>
+        </div>
+      {% endif %}
+
+      <p style="margin: 5px 0;">{{ comment.content }}</p>
+
+      {# ✅ 僅貼文作者可以刪除留言 #}
+      {% if post.author == user %}
+        <form method="POST" action="{% url 'delete_comment' comment.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" onclick="return confirm('確定要刪除此留言嗎？')" style="background: none; border: none; color: red; cursor: pointer;">刪除</button>
+        </form>
+      {% endif %}
+    </div>
     {% empty %}
       <p>目前尚無留言。</p>
     {% endfor %}
@@ -172,15 +303,74 @@
 
   <!-- 留言表單 -->
   {% if user.is_authenticated %}
-    <div class="comment-form">
-      <form method="post">
+    <div class="comment-form" style="padding: 18px 0 0 0;"> 
+      <form method="post" id="comment-form">
         {% csrf_token %}
-        {{ form.as_p }}
+        {# 只顯示留言內容欄位 #}
+        <div style="margin-bottom: 10px;">
+          <label for="id_content" style="font-weight: bold;">寫下你的留言與評分：</label>
+          {{ form.content }}
+        </div>
+        <div style="margin-bottom: 10px; display: flex; align-items: center;">
+          <label style="font-weight: bold; margin-right: 8px;">評分：</label>
+          <span id="star-rating">
+            {% for i in "12345" %}
+              <span class="rating-star" data-value="{{ i }}">&#9733;</span>
+            {% endfor %}
+          </span>
+          <input type="hidden" name="rate_comment" id="rating-input" value="">
+        </div>
         <button type="submit" class="submit-btn">送出留言</button>
       </form>
     </div>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const stars = document.querySelectorAll('.comment-form #star-rating .rating-star');
+      const ratingInput = document.getElementById('rating-input');
+
+      // 設定星星顏色
+      function setStars(rating) {
+        stars.forEach((star, idx) => {
+          star.style.color = (idx < rating) ? '#ffd700' : '#ccc';
+        });
+      }
+
+      // 點擊星星後更新數值與樣式
+      stars.forEach((star, idx) => {
+        star.addEventListener('click', () => {
+          const selectedRating = idx + 1;
+          ratingInput.value = selectedRating;
+          setStars(selectedRating);
+        });
+      });
+
+      // 若有預設值就載入
+      if (ratingInput && ratingInput.value) {
+        setStars(parseInt(ratingInput.value));
+      }
+
+      // 驗證留言內容是否為空
+      const commentForm = document.getElementById('comment-form');
+      if (commentForm) {
+        commentForm.addEventListener('submit', function(e) {
+          const content = document.getElementById('id_content').value.trim();
+          if (!content) {
+            alert('請輸入留言內容，不能只給星星評分！');
+            e.preventDefault();
+          }
+        });
+      }
+    });
+    </script>
+
   {% else %}
     <p><a href="{% url 'login' %}?next={{ request.path }}">請先登入以留言</a></p>
+  {% endif %}
+
+  {% if post.takedown_reason %}
+  <div style="color:red; font-weight:bold;">
+    {{ post.takedown_reason }}
+  </div>
   {% endif %}
 </div>
 

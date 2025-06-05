@@ -3,27 +3,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Create Post</title>
+  <title>Edit Draft</title>
   <link rel="stylesheet" href="{% static 'style.css' %}">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom, #f3f3f4 0%, #ede7fa 30%, #bcb4dd 100%);
-      padding: 40px 0;
-      display: flex;
-      justify-content: center;
-      height: 100vh;      
-      min-height: 100vh;
-      margin: 0;
-    }
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(to bottom, #f3f3f4 0%, #ede7fa 30%, #bcb4dd 100%);
+        background-attachment: fixed;
+        margin: 0;
+        padding: 40px 0;
+        display: flex;
+        justify-content: center;
+      }
 
     .post-container {
       background: #ffffff;
-      width: 700px;
-      padding: 15px 45px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      margin: 100px auto;
+      width: 600px;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     }
 
     .post-header {
@@ -53,19 +51,6 @@
       width: 100%;
       box-sizing: border-box;
       margin-bottom: 12px;
-    }
-
-    .input-box.error, select.input-box.error {
-      border: 2px solid #e74c3c;
-      background: #fff6f6;
-    }
-
-    .error-message {
-      color: #e74c3c;
-      font-size: 15px;
-      margin-bottom: 10px;
-      font-weight: bold;
-      text-align: left;
     }
 
     textarea.input-box {
@@ -103,6 +88,24 @@
       border: 1px solid #ccc;
     }
 
+    .photo-box {
+      position: relative;
+      display: inline-block;
+    }
+
+    .delete-photo-btn {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: #f00;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
     .button-group {
       display: flex;
       gap: 12px;
@@ -118,26 +121,21 @@
     }
 
     .btn-primary { background-color: #4a90e2; color: white; }
-    .btn-secondary { background-color: #aaa; color: white; }
-    .btn-danger { background-color: #ddd; color: black; }
+    .btn-secondary { background-color: #8a9ca9; color: white; }
+    .btn-danger { background-color: #d6d6d6; color: black; }
 
     .btn:hover { opacity: 0.9; }
 
-     .post-container {
-        animation: floatIn 0.6s ease;
-      }
-
-      @keyframes floatIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
+    /* 星星評分樣式 */
+    #star-rating {
+      font-size: 2rem;
+      color: #ffd700;
+      cursor: pointer;
+    }
+    #star-rating .star {
+      display: inline-block;
+      transition: color 0.2s;
+    }
   </style>
 </head>
 <body>
@@ -153,18 +151,6 @@
         {% endfor %}
       </div>
     </div>
-    <script>
-      // 自動隱藏訊息 3 秒（同時隱藏所有 .alert-success 與 style 內的 message 區塊）
-      setTimeout(function() {
-        document.querySelectorAll('.alert-success, [style*="border-left: 4px solid #4a90e2"]').forEach(function(el) {
-          el.style.display = 'none';
-        });
-        // 移除紅色錯誤框
-        document.querySelectorAll('.input-box.error, select.input-box.error').forEach(function(el) {
-          el.classList.remove('error');
-        });
-      }, 3000);
-    </script>
   {% endif %}
 
   <div class="post-header">
@@ -174,77 +160,47 @@
       <img src="{% static 'img/default_avatar.png' %}" class="avatar">
     {% endif %}
     <div class="post-user-info">
-      <strong>{{ user.username }}</strong> &gt; <em>Add your post</em>
+      <strong>{{ user.username }}</strong> &gt; <em>Edit your draft</em>
     </div>
   </div>
 
-  {% if messages %}
-    {% for message in messages %}
-      <div style="padding: 10px; margin-bottom: 16px; border-left: 4px solid #4a90e2; background: #eaf4ff; color: #333; border-radius: 6px;">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-
-  {% if form.errors and not request.POST %}
-    {# 不顯示錯誤訊息，只保留紅框 #}
-  {% endif %}
-
   <div style="background: #fffbea; padding: 10px 14px; margin-bottom: 18px; border-left: 4px solid #f1c40f; border-radius: 8px; color: #333;">
+    ⚠️ 此篇仍為草稿狀態，尚未發佈。<br>
     📸 照片若需刪除，請先儲存草稿再刪除。謝謝
-  </div> 
+  </div>  
+
   <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
 
     <!-- 各欄位 -->
-    <input type="text" name="title" class="input-box{% if form.title.errors %} error{% endif %}" placeholder="標題" value="{{ form.title.value|default_if_none:'' }}">
-    <textarea name="content" class="input-box{% if form.content.errors %} error{% endif %}" placeholder="內容">{{ form.content.value|default_if_none:'' }}</textarea>
+    <input type="text" name="title" class="input-box" placeholder="標題" value="{{ form.title.value|default_if_none:'' }}">
+    <textarea name="content" class="input-box" placeholder="內容">{{ form.content.value|default_if_none:'' }}</textarea>
 
-    <select name="location" class="input-box{% if form.location.errors %} error{% endif %}">
+    <select name="location" class="input-box">
       <option value="">選擇地點</option>
       {% for loc in locations %}
         <option value="{{ loc.id }}" {% if form.location.value|stringformat:"s" == loc.id|stringformat:"s" %}selected{% endif %}>{{ loc.name }}</option>
       {% endfor %}
     </select>
 
-    <select name="category" class="input-box{% if form.category.errors %} error{% endif %}">
+    <select name="category" class="input-box">
       <option value="">選擇分類</option>
       {% for cat in categories %}
         <option value="{{ cat.id }}" {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
       {% endfor %}
     </select>
 
-    <input type="text" name="address" class="input-box{% if form.address.errors %} error{% endif %}" placeholder="地址" value="{{ form.address.value|default_if_none:'' }}">
+    <input type="text" name="address" class="input-box" placeholder="地址" value="{{ form.address.value|default_if_none:'' }}">
 
     <!-- 評分欄位 -->
     <div style="margin-bottom: 16px;">
-      <div id="star-rating" style="font-size: 2rem; color: #ffd700; cursor: pointer;">
+      <label style="font-weight: bold; margin-bottom: 6px; display: block;">調整您的評分（可不填）：</label>
+      <div id="star-rating">
         {% for i in "12345" %}
           <span class="star" data-value="{{ forloop.counter }}">&#9733;</span>
         {% endfor %}
       </div>
       <input type="hidden" name="rate_posta" id="rating-input" value="{{ form.rate_posta.value|default_if_none:'' }}">
-      <script>
-        // 星星評分互動
-        const stars = document.querySelectorAll('#star-rating .star');
-        const ratingInput = document.getElementById('rating-input');
-        let currentRating = parseInt(ratingInput.value) || 0;
-        function updateStars(rating) {
-          stars.forEach((star, idx) => {
-            star.style.color = idx < rating ? '#ffd700' : '#ccc';
-          });
-        }
-        stars.forEach((star, idx) => {
-          star.addEventListener('mouseenter', () => updateStars(idx + 1));
-          star.addEventListener('mouseleave', () => updateStars(currentRating));
-          star.addEventListener('click', () => {
-            currentRating = idx + 1;
-            ratingInput.value = currentRating;
-            updateStars(currentRating);
-          });
-        });
-        updateStars(currentRating);
-      </script>
     </div>
 
     <!-- 多圖上傳 -->
@@ -253,20 +209,29 @@
       <input id="imageInput" type="file" name="images" multiple accept="image/*">
     </div>
 
-    <!-- 圖片預覽 -->
+    <!-- 新圖片預覽 -->
     <div class="preview" id="previewBox"></div>
 
-    <!-- 按鈕列 -->
+    <!-- 原有圖片 -->
+    <div class="preview">
+      {% for photo in photos %}
+        <div class="photo-box" id="photo-{{ photo.id }}">
+          <img src="{{ photo.image.url }}">
+          <button type="button" class="delete-photo-btn" data-id="{{ photo.id }}">×</button>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- 按鈕 -->
     <div class="button-group">
-      <button type="submit" name="publish" class="btn btn-primary">發佈</button>
       <button type="submit" name="save_draft" class="btn btn-secondary">儲存草稿</button>
-      <button type="submit" name="cancel" class="btn btn-danger">取消</button>
+      <button type="submit" name="publish" class="btn btn-primary">立即發佈</button>
+      <a href="{% url 'profile' %}?section=drafts" class="btn btn-danger">取消修改</a>
     </div>
   </form>
-
-  {% include "posts/form_snippet.html" %}
 </div>
 
+<!-- JS -->
 <script>
   document.getElementById("imageInput").addEventListener("change", function(event) {
     const preview = document.getElementById("previewBox");
@@ -278,6 +243,47 @@
       preview.appendChild(img);
     }
   });
+
+  document.querySelectorAll('.delete-photo-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      const photoId = this.dataset.id;
+      if (confirm("確定要刪除這張圖片嗎？")) {
+        fetch(`/delete_photo/${photoId}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+          },
+        }).then(response => {
+          if (response.ok) {
+            document.getElementById(`photo-${photoId}`).remove();
+          } else {
+            alert('刪除失敗');
+          }
+        });
+      }
+    });
+  });
+
+  // 新增星星互動功能
+  const stars = document.querySelectorAll('#star-rating .star');
+  const ratingInput = document.getElementById('rating-input');
+  let currentRating = parseInt(ratingInput.value) || 0;
+  function updateStars(rating) {
+    stars.forEach((star, idx) => {
+      star.style.color = idx < rating ? '#ffd700' : '#ccc';
+    });
+  }
+  stars.forEach((star, idx) => {
+    star.addEventListener('mouseenter', () => updateStars(idx + 1));
+    star.addEventListener('mouseleave', () => updateStars(currentRating));
+    star.addEventListener('click', () => {
+      currentRating = idx + 1;
+      ratingInput.value = currentRating;
+      updateStars(currentRating);
+    });
+  });
+  updateStars(currentRating);
 </script>
 </body>
 </html>
+{% include "posts/form_snippet.html" %}

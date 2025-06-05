@@ -3,6 +3,7 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
+from .views import MyPasswordChangeView
 
 urlpatterns = [
     # 首頁（地圖首頁）
@@ -16,28 +17,28 @@ urlpatterns = [
     path('delete/<int:pk>/', views.delete_post, name='delete_post'), # 刪除貼文
     path('favorite/<int:post_id>/', views.toggle_favorite, name='toggle_favorite'), # 收藏貼文
     path('profile/', views.profile, name='profile'),
+    path('draft/<int:pk>/edit/', views.edit_draft, name='edit_draft'), # 編輯草稿
+    path('delete_photo/<int:photo_id>/', views.delete_photo, name='delete_photo'), #刪除圖片
+    path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'), # 刪除留言
 
     # 使用者帳號功能
     path('signup/', views.signup, name='signup'),                          # 註冊
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),  # 登出
+    path('accounts/password_change/', MyPasswordChangeView.as_view(), name='password_change'),
     path('accounts/', include('django.contrib.auth.urls')),                # Django 內建登入/密碼變更等
+    
 
     # 個人資料與頭像
-    path('profile/', views.profile, name='profile'),                        # 使用者個人資料頁
-    path('upload/', views.upload_avatar, name='upload_avatar'),             # 上傳頭像（備用 API）
-    path('avatar/<str:filename>/', views.show_avatar, name='show_avatar'),  # 顯示頭像檔案
+    path('profile/', views.profile, name='profile'),                       # 使用者個人資料頁
 
     # 分類與篩選功能
     path('location/<int:location_id>/', views.filter_by_location, name='filter_by_location'),  # 地點篩選
     path('category/<int:category_id>/', views.filter_by_category, name='filter_by_category'),  # 分類篩選
 
-    # 路線規劃功能
-    path('my_routes/', views.my_routes, name='my_routes'),                            # 我的路線
-    path('create_route/', views.create_route, name='create_route'),                  # 建立路線
-    path('edit_route/<int:route_id>/', views.edit_route, name='edit_route'),                        # 編輯路線
-    path('delete_route/<int:route_id>/', views.delete_route, name='delete_route'),                    # 刪除路線
-    path('add_place_to_route/<int:route_id>/', views.add_place_to_route, name='add_place_to_route'),  # 新增景點到路線
-    path('edit_route_items/<int:route_id>/', views.edit_route_items, name='edit_route_items'),
+    # 內容檢舉與審核
+    path('report_post/<int:pk>/', views.report_post, name='report_post'),  # 檢舉貼文
+    path('manual_review/', views.manual_review_list, name='manual_review_list'),  # 審核頁面
+    path('manual_review_action/<int:pk>/<str:action>/', views.manual_review_action, name='manual_review_action'),  # 審核動作
 ]
 
 # 開發環境媒體檔案處理（DEBUG 模式下啟用）

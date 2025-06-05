@@ -1,0 +1,6 @@
+<h2>檢舉貼文：{{ post.title }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">送出檢舉</button>
+</form>

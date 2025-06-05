@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'places',
     'posts',
     'widget_tweaks',
-
     
 ]
 
@@ -60,7 +59,7 @@ ROOT_URLCONF = 'SA_system.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],         
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -107,6 +106,17 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# 設定訊息標籤對應的 Bootstrap 顏色
+from django.contrib.messages import constants as message_constants
+MESSAGE_TAGS = {
+    message_constants.DEBUG: 'secondary',
+    message_constants.INFO: 'info',
+    message_constants.SUCCESS: 'success',
+    message_constants.WARNING: 'warning',
+    message_constants.ERROR: 'danger',   # ✅ 將 error 對應為 Bootstrap 的 danger（紅色）
+}
+
 
 
 import os
