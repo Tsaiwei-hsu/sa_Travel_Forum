@@ -98,6 +98,20 @@
     transform-origin: center bottom; /* 以底部為旋轉軸心 */
   }
 
+  .corner-image-bottom-left {
+    position: absolute;
+    bottom: 70px;
+    left: 90px;
+    width: 180px; /* 放大 */
+    height: auto;
+    z-index: 10;
+    opacity: 0.95;
+    pointer-events: none;
+    animation: swingLeftRight 3s ease-in-out infinite;
+    transform-origin: center bottom; /* 以底部為旋轉軸心 */
+  }
+
+
   @keyframes swingLeftRight {
     0%   { transform: rotate(0deg); }
     25%  { transform: rotate(3deg); }
@@ -138,5 +152,7 @@
 
 <!-- ✅ 右下角圖片（你要的） -->
 <img src="{% static 'img/corner-deco.png' %}" class="corner-image" alt="Decoration">
+<img src="{% static 'img/kangaroo.png' %}" class="corner-image-bottom-left" alt="Decoration">
+
 
 {% endblock %}

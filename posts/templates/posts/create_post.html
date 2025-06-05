@@ -12,8 +12,8 @@
       padding: 40px 0;
       display: flex;
       justify-content: center;
-      height: 100vh;      
       min-height: 100vh;
+      align-items: flex-start; /* 讓卡片從上方開始，內容多時自動變高 */
       margin: 0;
     }
 
@@ -21,9 +21,10 @@
       background: #ffffff;
       width: 700px;
       padding: 15px 45px;
-      border-radius: 12px;
+      padding-top: 40px; /* 頂部空白加大 */
+      border-radius: 32px; /* 四角都圓潤 */
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      margin: 100px auto;
+      margin: 40px auto;
     }
 
     .post-header {
@@ -249,7 +250,7 @@
 
     <!-- 多圖上傳 -->
     <div class="file-upload">
-      <label class="upload-label" for="imageInput">+ Add Photo</label>
+      <label class="upload-label" for="imageInput">+ 新增照片</label>
       <input id="imageInput" type="file" name="images" multiple accept="image/*">
     </div>
 

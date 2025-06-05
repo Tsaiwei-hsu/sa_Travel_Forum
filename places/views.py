@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .models import State, City, Category, Post
+import time
 
 # 首頁 view
 def home(request):
@@ -33,7 +34,8 @@ def filter_by_state(request, state_id):
     cities = City.objects.filter(state=state)
     return render(request, 'posts/city_list.html', {
         'state': state,
-        'cities': cities
+        'cities': cities,
+        'timestamp': int(time.time()),
     })
 
 # 根據城市 ID 顯示可選的分類

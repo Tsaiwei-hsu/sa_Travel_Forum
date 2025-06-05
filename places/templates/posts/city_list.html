@@ -64,14 +64,14 @@
   }
 
   /* 州背景圖設定 */
-  .bg-nsw { background-image: url("{% static 'img/nsw.png' %}"); }
-  .bg-vic { background-image: url("{% static 'img/vic.png' %}"); }
-  .bg-qld { background-image: url("{% static 'img/qld.png' %}"); }
-  .bg-sa  { background-image: url("{% static 'img/sa.png' %}"); }
-  .bg-wa  { background-image: url("{% static 'img/wa.png' %}"); }
-  .bg-tas { background-image: url("{% static 'img/tas.png' %}"); }
-  .bg-nt  { background-image: url("{% static 'img/nt.png' %}"); }
-  .bg-act { background-image: url("{% static 'img/act.png' %}"); }
+  .bg-nsw { background-image: url("{% static 'img/nsw.png' %}?v={{ timestamp }}"); }
+  .bg-vic { background-image: url("{% static 'img/vic.png' %}?v={{ timestamp }}"); }
+  .bg-qld { background-image: url("{% static 'img/qld.png' %}?v={{ timestamp }}"); }
+  .bg-sa  { background-image: url("{% static 'img/sa.png' %}?v={{ timestamp }}"); }
+  .bg-wa  { background-image: url("{% static 'img/wa.png' %}?v={{ timestamp }}"); }
+  .bg-tas { background-image: url("{% static 'img/tas.png' %}?v={{ timestamp }}"); }
+  .bg-nt  { background-image: url("{% static 'img/nt.png' %}?v={{ timestamp }}"); }
+  .bg-act { background-image: url("{% static 'img/act.png' %}?v={{ timestamp }}"); }
 </style>
 
 {% comment %} 城市內容區塊（含背景圖） {% endcomment %}
