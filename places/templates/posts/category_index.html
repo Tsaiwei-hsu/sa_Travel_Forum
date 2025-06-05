@@ -85,15 +85,27 @@
   }
 
   .corner-image {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 300px;
-  height: auto;
-  z-index: 10;
-  opacity: 0.9;
-  pointer-events: none; /* 不阻擋滑鼠點擊 */
-}
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    height: auto;
+    z-index: 10;
+    opacity: 0.9;
+    pointer-events: none;
+    animation: swingLeftRight 3s ease-in-out infinite;
+    transform-origin: center bottom; /* 以底部為旋轉軸心 */
+  }
+
+  @keyframes swingLeftRight {
+    0%   { transform: rotate(0deg); }
+    25%  { transform: rotate(3deg); }
+    50%  { transform: rotate(0deg); }
+    75%  { transform: rotate(-3deg); }
+    100% { transform: rotate(0deg); }
+  }
+</style>
+
 
 </style>
   <!-- 主內容 -->

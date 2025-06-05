@@ -16,6 +16,7 @@
     box-sizing: border-box;
     color: #000;
     position: relative;
+    z-index: 10;
   }
 
   /* 地址欄位樣式 */
@@ -76,6 +77,8 @@
   /* 留言區塊 */
   .comments {
     margin-top: 30px;
+    z-index: 10;
+    position: relative;
   }
 
   .comments .comment {
@@ -84,6 +87,11 @@
   }
 
   /* 留言表單樣式 */
+  .comment-form {
+    z-index: 10;
+    position: relative;
+  }
+
   .comment-form textarea {
     width: 100%;
     min-height: 80px;
@@ -136,13 +144,30 @@
 }
 
 .favorite-icon {
-  font-size: 22px;
-  color: gray;
-  transition: color 0.2s ease;
+  font-size: 1.8rem;
+  color: rgb(114, 113, 113);
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
 .favorite-icon.favorited {
-  color: #b38aff; /* 收藏後的顏色，可改 */
+  color: #e38c94;
+}
+
+.favorite-btn:hover .favorite-icon {
+  color: #b09bb3;
+}
+
+.rating-star {
+  position: static !important;
+  font-size: 1.5em;
+  color: #ccc;
+  cursor: pointer;
+  user-select: none;
+  z-index: 20;
+  background: none;
+  animation: none;
+  display: inline-block;
 }
 
 </style>
@@ -178,7 +203,7 @@
     <div class="post-user-info">
       <strong>{{ post.author.username }}</strong> &gt; <em>View your post</em>
       {% if post.rate_posta %}
-        <div style="margin-top: 4px; font-size: 1.2em; color: #ffc760; display: flex; align-items: center; gap: 2px;">
+        <div style="margin-top: 4px; font-size: 1em; color: #ffc760; display: flex; align-items: center; gap: 2px;">
           {% for i in "12345" %}
             {% if post.rate_posta >= i|add:'0' %}
               &#9733;
@@ -186,9 +211,6 @@
               &#9734;
             {% endif %}
           {% endfor %}
-          <span style="color:#888; font-size:0.95em; margin-left: 4px;">
-            ({{ post.rate_posta|floatformat:1 }})
-          </span>
         </div>
       {% endif %}
     </div>
@@ -217,46 +239,25 @@
 
     <!-- 收藏標籤按鈕 -->
   <button class="favorite-btn" data-post-id="{{ post.id }}" style="background: none; border: none; cursor: pointer;">
-    <i class="fa-solid fa-tag favorite-icon {% if post.id in user_favorites %}favorited{% endif %}"></i>
+    <i class="fa-solid fa-tag favorite-icon {% if post.id in user_favorites %}favorited{% endif %}" style="font-size: 1.8rem;"></i>
   </button>
 
-  <hr style="margin: 18px 0; border: none; border-top: 1.5px solid #e0e0e0;">
+  <hr style="margin: 18px 0; border: none; border-top: 1.5px solid #b8b4b4;">
 
   <!-- 留言區塊 -->
   <div class="comments">
     {# 平均留言評分顯示 #}
     {% if comments %}
-      <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 18px;">
-        {% if avg_comment_rating %}
-          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 18px;">
-            <span style="font-size: 1.15rem; color: #222; font-weight: bold;">
-              <span style="color:#888; font-size:1em; margin-right: 6px;">平均評分：</span>
-              <span style="display: flex; align-items: center; gap: 2px;">
-                {% for i in "12345" %}
-                  {% with star_value=i|add:'0' %}
-                    {% if avg_comment_rating >= star_value %}
-                      <span style="color:#ffd700; font-size:1.1em;">&#9733;</span>
-                    {% elif avg_comment_rating >= star_value|add:'-0.5' %}
-                      <span style="position: relative; display: inline-block; width: 1.1em; font-size: 1.1em;">
-                        <span style="position: absolute; width: 50%; overflow: hidden; color: #ffd700;">&#9733;</span>
-                        <span style="color: #ccc;">&#9734;</span>
-                      </span>
-                    {% else %}
-                      <span style="color:#ccc; font-size:1.1em;">&#9734;</span>
-                    {% endif %}
-                  {% endwith %}
-                {% endfor %}
-              </span>
-              <span style="color:#888; font-size:0.92em; margin-left: 4px;">
-                ({{ avg_comment_rating|floatformat:1 }})
-              </span>
-            </span>
-          </div>
-        {% else %}
-          <span style="color: #888; font-size: 1.1rem;">尚無評分</span>
-        {% endif %}
-      </div>
+      {% if avg_comment_rating %}
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 18px;">
+          <span style="color:#888; font-size:0.98em; margin-right: 4px;">平均</span>
+          <span style="font-size: 1.1em; color: #444; font-weight: bold; margin-right: 8px;">{{ avg_comment_rating|floatformat:1 }}</span>
+          <span style="font-size: 1.25em; color: #ffd700;">&#9733;</span>
+        </div>
+        <hr style="margin: 18px 0; border: none; border-top: 1.5px solid #e0e0e0;">
+      {% endif %}
     {% endif %}
+
     {# 單則留言 #}
     {% for comment in comments %}
     <div class="comment" style="margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #ddd;">
@@ -295,7 +296,7 @@
 
   <!-- 留言表單 -->
   {% if user.is_authenticated %}
-    <div class="comment-form" style="padding: 18px 0 0 0;">
+    <div class="comment-form" style="padding: 18px 0 0 0;"> 
       <form method="post" id="comment-form">
         {% csrf_token %}
         {# 只顯示留言內容欄位 #}
@@ -307,41 +308,54 @@
           <label style="font-weight: bold; margin-right: 8px;">評分：</label>
           <span id="star-rating">
             {% for i in "12345" %}
-              <span class="star" data-value="{{ i }}" style="font-size: 1.5em; color: #ccc; cursor: pointer;">&#9733;</span>
+              <span class="rating-star" data-value="{{ i }}">&#9733;</span>
             {% endfor %}
           </span>
-          <input type="hidden" name="rating" id="rating-input" value="{{ form.rating.value|default_if_none:'' }}">
+          <input type="hidden" name="rate_comment" id="rating-input" value="">
         </div>
         <button type="submit" class="submit-btn">送出留言</button>
       </form>
     </div>
     <script>
-      // 星星互動
-      const stars = document.querySelectorAll('.comment-form #star-rating .star');
+    document.addEventListener("DOMContentLoaded", function () {
+      const stars = document.querySelectorAll('.comment-form #star-rating .rating-star');
       const ratingInput = document.getElementById('rating-input');
+
+      // 設定星星顏色
       function setStars(rating) {
         stars.forEach((star, idx) => {
           star.style.color = (idx < rating) ? '#ffd700' : '#ccc';
         });
       }
+
+      // 點擊星星後更新數值與樣式
       stars.forEach((star, idx) => {
         star.addEventListener('click', () => {
-          ratingInput.value = idx + 1;
-          setStars(idx + 1);
+          const selectedRating = idx + 1;
+          ratingInput.value = selectedRating;
+          setStars(selectedRating);
         });
       });
-      // 若有預設值
-      if (ratingInput.value) setStars(parseInt(ratingInput.value));
 
-      // 驗證必須填寫留言內容才能送出
-      document.getElementById('comment-form').addEventListener('submit', function(e) {
-        const content = document.getElementById('id_content').value.trim();
-        if (!content) {
-          alert('請輸入留言內容，不能只給星星評分！');
-          e.preventDefault();
-        }
-      });
+      // 若有預設值就載入
+      if (ratingInput && ratingInput.value) {
+        setStars(parseInt(ratingInput.value));
+      }
+
+      // 驗證留言內容是否為空
+      const commentForm = document.getElementById('comment-form');
+      if (commentForm) {
+        commentForm.addEventListener('submit', function(e) {
+          const content = document.getElementById('id_content').value.trim();
+          if (!content) {
+            alert('請輸入留言內容，不能只給星星評分！');
+            e.preventDefault();
+          }
+        });
+      }
+    });
     </script>
+
   {% else %}
     <p><a href="{% url 'login' %}?next={{ request.path }}">請先登入以留言</a></p>
   {% endif %}

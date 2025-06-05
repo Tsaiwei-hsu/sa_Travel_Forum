@@ -22,7 +22,7 @@
     }
 
     .star {
-      position: absolute;
+      position: fixed;
       width: 10px;
       height: 10px;
       background: transparent;
@@ -55,7 +55,7 @@
     }
 
     .star-floating {
-      position: absolute;
+      position: fixed;
       font-size: 18px;
       color: #fff7cc;
       opacity: 0.7;
@@ -99,6 +99,8 @@
       color: white;
       font-size: 1.25rem;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 9;
     }
 
     .main-header .logo {
@@ -154,12 +156,19 @@
     main {
       padding: 40px 20px;
     }
+
+    .post-card,
+    .profile-container,
+    .post-item,
+    .post-horizontal {
+      position: relative;
+      z-index: 1;
+    }
   </style>
 </head>
 
 <body data-authenticated="{{ user.is_authenticated }}">
-  
-  <!-- 星星裝飾 -->
+  <!-- 星星裝飾（移到 header 之前，確保在背景且可隨頁面滾動） -->
   <span class="star" style="top: 40px; left: 80px;">★</span>
   <span class="star" style="top: 90px; left: 250px;">★</span>
   <span class="star" style="top: 120px; left: 700px;">★</span>
