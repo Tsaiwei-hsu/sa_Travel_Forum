@@ -77,16 +77,20 @@
       height: 100%;
       margin: 0;
       padding: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     body {
       display: flex;
       flex-direction: column;
+      min-height: 100vh;
     }
 
     main {
       flex: 1;
       padding: 40px 20px;
+      overflow: visible;
     }
 
     .main-header {
@@ -163,6 +167,11 @@
     .post-horizontal {
       position: relative;
       z-index: 1;
+    }
+
+    .frame {
+      overflow: unset;
+      max-height: none;
     }
   </style>
 </head>
