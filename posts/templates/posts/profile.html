@@ -152,10 +152,12 @@
     <div style="display: flex; justify-content: center; margin-bottom: 20px;">
       <div style="max-width: 700px; width: 100%;">
         {% for message in messages %}
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
+          {% if message != '貼文已刪除（僅自己可見）' and message != '草稿已刪除（僅自己可見）' %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endif %}
         {% endfor %}
       </div>
     </div>
@@ -214,6 +216,9 @@
         <div class="post-text">
           <h4>{{ post.title }}</h4>
           <p>{{ post.content|truncatewords:20 }}</p>
+          {% if post.is_deleted and post.takedown_reason %}
+            <div style="color:#d32f2f; font-weight:bold; margin-bottom:6px;">此貼文已被管理員下架：{{ post.takedown_reason }}</div>
+          {% endif %}
           <a href="{% url 'post_detail' post.pk %}">查看</a>
           <a href="{% url 'edit_post' post.pk %}">編輯</a>
           <form action="{% url 'delete_post' post.pk %}" method="post" style="display:inline">
@@ -288,7 +293,7 @@
     if (event) event.target.classList.add('active');
   }
 
-  // ✅ 自動顯示後端指定的 section（如 drafts）
+  // ✅ 自動顯示後端指定的 section（如 drafts ）
   document.addEventListener('DOMContentLoaded', function () {
     const section = "{{ section|default:'posts' }}";
 

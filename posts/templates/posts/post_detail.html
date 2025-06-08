@@ -170,6 +170,104 @@
   display: inline-block;
 }
 
+  /* 檢舉按鈕改為連結樣式 */
+  .report-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    color: #1976d2;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    font-size: 1.05rem;
+    font-weight: normal;
+    cursor: pointer;
+    box-shadow: none;
+    text-decoration: underline;
+    margin-top: 10px;
+    transition: color 0.2s;
+  }
+  .report-btn i {
+    font-size: 1.1em;
+    margin-right: 4px;
+  }
+  .report-btn:hover {
+    color: #0d47a1;
+    text-decoration: underline;
+  }
+
+  /* 檢舉連結固定右下角（縮小版） */
+  .report-btn-fixed {
+    position: fixed;
+    right: 32px;
+    bottom: 32px;
+    z-index: 100;
+    background: none;
+    color: #f24a4a;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    font-size: 0.95rem;
+    font-weight: normal;
+    cursor: pointer;
+    box-shadow: none;
+    text-decoration: underline;
+    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.85;
+  }
+  .report-btn-fixed i {
+    font-size: 1em;
+    margin-right: 2px;
+  }
+  .report-btn-fixed:hover {
+    color: #dd2020;
+    opacity: 1;
+    text-decoration: underline;
+  }
+
+  /* 新增留言送出與檢舉同排樣式 */
+.comment-form-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 8px;
+}
+.comment-report-link {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0;
+}
+.report-btn-inline {
+  background: none;
+  color: #f24a4a;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: normal;
+  cursor: pointer;
+  box-shadow: none;
+  text-decoration: underline;
+  transition: color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.85;
+}
+.report-btn-inline i {
+  font-size: 1em;
+  margin-right: 2px;
+}
+.report-btn-inline:hover {
+  color: #dd2020;
+  opacity: 1;
+  text-decoration: underline;
+}
+
 </style>
 
 <!-- 貼文主區塊 -->
@@ -217,7 +315,7 @@
   </div>
 
   <!-- 貼文內容 -->
-  <div class="post-detail">
+  <div class="post-detail" style="position: relative;">
     <h2>{{ post.title }}</h2>
     <p>{{ post.content }}</p>
     {% if post.address %}
@@ -281,8 +379,8 @@
 
       <p style="margin: 5px 0;">{{ comment.content }}</p>
 
-      {# ✅ 僅貼文作者可以刪除留言 #}
-      {% if post.author == user %}
+      {# ✅ 僅貼文作者可以刪除留言，且 comment.id 存在時才顯示刪除表單 #}
+      {% if post.author == user and comment.id %}
         <form method="POST" action="{% url 'delete_comment' comment.id %}" style="display:inline;">
           {% csrf_token %}
           <button type="submit" onclick="return confirm('確定要刪除此留言嗎？')" style="background: none; border: none; color: red; cursor: pointer;">刪除</button>
@@ -296,7 +394,7 @@
 
   <!-- 留言表單 -->
   {% if user.is_authenticated %}
-    <div class="comment-form" style="padding: 18px 0 0 0;"> 
+    <div class="comment-form" id="comment-form-block" style="padding: 18px 0 0 0;"> 
       <form method="post" id="comment-form">
         {% csrf_token %}
         {# 只顯示留言內容欄位 #}
@@ -304,6 +402,17 @@
           <label for="id_content" style="font-weight: bold;">寫下你的留言與評分：</label>
           {{ form.content }}
         </div>
+        {% if form.content.errors %}
+        <div style="background: #fffbea; padding: 8px 14px; margin-bottom: 12px; border-left: 4px solid #f1c40f; border-radius: 8px; color: #333;">
+          ⚠️ {{ form.content.errors.0 }}
+        </div>
+        <script>
+        window.addEventListener('DOMContentLoaded', function() {
+          var block = document.getElementById('comment-form-block');
+          if (block) block.scrollIntoView({behavior: 'smooth', block: 'center'});
+        });
+        </script>
+        {% endif %}
         <div style="margin-bottom: 10px; display: flex; align-items: center;">
           <label style="font-weight: bold; margin-right: 8px;">評分：</label>
           <span id="star-rating">
@@ -313,7 +422,14 @@
           </span>
           <input type="hidden" name="rate_comment" id="rating-input" value="">
         </div>
-        <button type="submit" class="submit-btn">送出留言</button>
+        <div class="comment-form-actions">
+          <button type="submit" class="submit-btn">送出留言</button>
+        </div>
+        {% if user.is_authenticated and user != post.author %}
+          <div class="comment-report-link">
+            <a href="{% url 'report_post' post.pk %}" class="report-btn-inline"><i class="fa-solid fa-flag"></i>檢舉貼文</a>
+          </div>
+        {% endif %}
       </form>
     </div>
     <script>

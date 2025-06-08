@@ -4,37 +4,15 @@ body {
   background-color: #f0f0f0;
 }
 
-/* 單篇貼文容器 */
-.post-container {
+/* 只針對 post_list、profile、post_deleted 等頁面使用深色 post-container，避免影響表單頁 */
+.post-list-container .post-container,
+.profile-container .post-container,
+.post-deleted-container .post-container {
   background-color: #444;
-  border-radius: 20px;
-  padding: 25px;
-  width: 90%;
-  max-width: 500px;
-  margin: 40px auto;
   color: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* 貼文標題區塊（含頭像） */
-.post-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-/* 頭像樣式 */
-.avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-}
-
-/* 使用者名稱文字 */
-.post-user-info {
-  margin-left: 12px;
-  font-size: 16px;
-}
+/* 其餘頁面（如 create/edit）由各自 style 控制 post-container 樣式 */
 
 /* 表單欄位外框 */
 .form-group {
@@ -43,8 +21,10 @@ body {
   margin-bottom: 12px;
 }
 
-/* 表單輸入欄位通用樣式 */
-input, select, textarea {
+/* input, select, textarea 樣式僅針對 .form-group 內部，避免全域污染 */
+.form-group input,
+.form-group select,
+.form-group textarea {
   padding: 10px;
   border-radius: 10px;
   border: none;
@@ -54,7 +34,7 @@ input, select, textarea {
 }
 
 /* 多行文字框設定 */
-textarea {
+.form-group textarea {
   resize: none;
   height: 100px;
 }

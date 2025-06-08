@@ -33,6 +33,11 @@ class Post(models.Model):
     city = models.ForeignKey(City, on_delete=models.CASCADE, default=1)       
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)  
     address = models.CharField(max_length=255, blank=True)  
+    is_approved = models.BooleanField(default=False)
+    is_reported = models.BooleanField(default=False)
+    report_reason = models.CharField(max_length=255, blank=True, null=True)  # 新增：檢舉理由
+    manual_reviewed = models.BooleanField(default=False)  # 新增：是否已人工審核
+    takedown_reason = models.CharField(max_length=255, blank=True, null=True)  # 新增：下架理由
 
     def __str__(self):
         return self.title

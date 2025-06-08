@@ -26,6 +26,13 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)       
     is_draft = models.BooleanField(default=False)
     rate_posta = models.FloatField(null=True, blank=True, help_text="上傳者評分，可不填")
+    is_reported = models.BooleanField(default=False)
+    report_reason = models.CharField(max_length=255, blank=True, null=True)
+    report_time = models.DateTimeField(null=True, blank=True, help_text="檢舉時間")
+    manual_reviewed = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False)
+    takedown_reason = models.CharField(max_length=255, blank=True, null=True)
+    is_deleted = models.BooleanField(default=False, help_text="軟刪除：被刪除則不顯示於前台")
 
     def __str__(self):
         return self.title

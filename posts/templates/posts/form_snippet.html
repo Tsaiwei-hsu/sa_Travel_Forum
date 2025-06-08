@@ -1,0 +1,6 @@
+{% comment %} posts/form_snippet.html {% endcomment %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">送出</button>
+</form>

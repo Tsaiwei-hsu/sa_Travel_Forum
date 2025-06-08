@@ -1,0 +1,8 @@
+{% extends 'posts/base.html' %}
+{% block content %}
+<div class="post-container" style="text-align:center; padding: 60px 0;">
+  <h2 style="color:#d32f2f;">此貼文已被作者刪除</h2>
+  <p style="color:#888; margin-top:18px;">很抱歉，這篇貼文已被作者刪除，無法瀏覽內容。</p>
+  <a href="{% url 'post_list' %}" class="submit-btn" style="margin-top:30px;">回首頁</a>
+</div>
+{% endblock %}

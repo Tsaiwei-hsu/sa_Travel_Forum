@@ -22,9 +22,6 @@ urlpatterns = [
     path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'), # 刪除留言
 
 
-
-
-
     # 使用者帳號功能
     path('signup/', views.signup, name='signup'),                          # 註冊
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),  # 登出
@@ -38,6 +35,11 @@ urlpatterns = [
     # 分類與篩選功能
     path('location/<int:location_id>/', views.filter_by_location, name='filter_by_location'),  # 地點篩選
     path('category/<int:category_id>/', views.filter_by_category, name='filter_by_category'),  # 分類篩選
+
+     # 內容檢舉與審核
+    path('report_post/<int:pk>/', views.report_post, name='report_post'),  # 檢舉貼文
+    path('manual_review/', views.manual_review_list, name='manual_review_list'),  # 審核頁面
+    path('manual_review_action/<int:pk>/<str:action>/', views.manual_review_action, name='manual_review_action'),  # 審核動作
 ]
 
 # 開發環境媒體檔案處理（DEBUG 模式下啟用）

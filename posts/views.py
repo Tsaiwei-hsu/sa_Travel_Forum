@@ -7,15 +7,18 @@ from django.contrib.auth.views import LogoutView
 from django.contrib.auth.views import PasswordChangeView
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
+from django.core.mail import send_mail
 from django.urls import reverse
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponseForbidden
 from django.contrib import messages
 from django import forms
 import os
+from django.utils import timezone
+
 
 from .forms import (
-    CustomUserCreationForm, CommentForm, PostForm, PhotoForm, UserProfileForm
+    CustomUserCreationForm, CommentForm, PostForm, PhotoForm, UserProfileForm, ReportForm
 )
 
 # 使用者基本資料表單（用於 profile）
@@ -65,8 +68,9 @@ def profile(request):
         profile_form = UserProfileForm(instance=user_profile)
 
     my_posts = request.user.post_set.filter(is_draft=False).order_by('-created_at')
-    user_drafts = request.user.post_set.filter(is_draft=True).order_by('-created_at') 
-    my_favorites = Favorite.objects.filter(user=request.user).select_related('post')
+    user_drafts = request.user.post_set.filter(is_draft=True, is_deleted=False).order_by('-created_at') 
+    my_favorites = Favorite.objects.filter(user=request.user, post__is_deleted=False).select_related('post')
+    deleted_posts = request.user.post_set.filter(is_deleted=True).order_by('-created_at')
 
     return render(request, 'posts/profile.html', {
         'section': section,
@@ -75,6 +79,7 @@ def profile(request):
         'my_posts': my_posts,
         'favorites': my_favorites,
         'user_drafts': user_drafts,
+        'deleted_posts': deleted_posts,
     })
 
 # 建立貼文（多圖）
@@ -148,6 +153,14 @@ def edit_post(request, pk):
             post = post_form.save(commit=False)
             rate_posta = request.POST.get('rate_posta')
             post.rate_posta = float(rate_posta) if rate_posta else None
+            # 若該貼文曾被軟刪除，重新編輯時自動恢復顯示，並重設所有審核欄位
+            if post.is_deleted:
+                post.is_deleted = False
+                post.takedown_reason = None
+                post.is_approved = False
+                post.manual_reviewed = False
+                post.is_reported = False
+                post.report_reason = None
             post.save()
             for img in request.FILES.getlist('images'):
                 Photo.objects.create(post=post, image=img)
@@ -214,13 +227,14 @@ def delete_post(request, pk):
     post = get_object_or_404(Post, pk=pk, author=request.user)
 
     if request.method == 'POST':
-        post.delete()
+        post.is_deleted = True
+        post.save()
         if post.is_draft:
-            messages.success(request, "草稿已刪除")
+            messages.success(request, "草稿已刪除（僅自己可見）")
             return redirect('/profile/?section=drafts')
         else:
-            messages.success(request, "貼文已刪除")
-            return redirect('/profile/?section=published')
+            messages.success(request, "貼文已刪除（僅自己可見）")
+            return redirect('/profile/?section=posts')
     else:
         messages.error(request, "刪除失敗：必須透過 POST 請求")
         return redirect('post_detail', pk=pk)
@@ -228,6 +242,9 @@ def delete_post(request, pk):
 # 單篇詳情
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
+    if post.is_deleted:
+        if request.user != post.author:
+            return render(request, 'posts/post_deleted.html', {'post': post})
     comments = post.comments.all()
     user_favorites = Favorite.objects.filter(user=request.user).values_list('post_id', flat=True) if request.user.is_authenticated else []
 
@@ -264,12 +281,12 @@ def post_detail(request, pk):
 # 貼文列表
 def post_list(request):
     location_name = request.GET.get('location')
-    posts = Post.objects.filter(is_draft=False).order_by('-created_at')
+    posts = Post.objects.filter(is_draft=False, is_deleted=False).order_by('-created_at')
     if location_name:
         location = get_object_or_404(Location, name=location_name)
         posts = posts.filter(location=location)
 
-    user_favorites = Favorite.objects.filter(user=request.user).values_list('post_id', flat=True) if request.user.is_authenticated else []
+    user_favorites = Favorite.objects.filter(user=request.user, post__is_deleted=False).values_list('post_id', flat=True) if request.user.is_authenticated else []
 
     return render(request, 'posts/post_list.html', {
         'posts': posts,
@@ -331,3 +348,39 @@ class MyPasswordChangeView(PasswordChangeView):
     def form_valid(self, form):
         messages.success(self.request, '密碼已成功修改')
         return super().form_valid(form)
+    
+ # 檢舉貼文
+@login_required
+def report_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == 'POST':
+        form = ReportForm(request.POST)
+        if form.is_valid():
+            post.is_reported = True
+            post.report_reason = form.cleaned_data['reason']
+            post.report_time = timezone.now()
+            post.save()
+            return redirect('post_detail', pk=pk)
+    else:
+        form = ReportForm()
+    return render(request, 'posts/report_post.html', {'form': form, 'post': post})
+
+from django.contrib.admin.views.decorators import staff_member_required
+
+@staff_member_required
+def manual_review_list(request):
+    posts = Post.objects.filter(is_reported=True, manual_reviewed=False)
+    return render(request, 'posts/manual_review_list.html', {'posts': posts})
+
+@staff_member_required
+def manual_review_action(request, pk, action):
+    post = get_object_or_404(Post, pk=pk)
+    if action == 'approve':
+        post.is_approved = True
+        post.takedown_reason = None
+    elif action == 'reject':
+        post.is_approved = False
+        post.takedown_reason = "因不符合規定而被下架"
+    post.manual_reviewed = True
+    post.save()
+    return redirect('manual_review_list')
