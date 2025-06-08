@@ -28,13 +28,15 @@ urlpatterns = [
     path('accounts/password_change/', MyPasswordChangeView.as_view(), name='password_change'),
     path('accounts/', include('django.contrib.auth.urls')),                # Django 內建登入/密碼變更等
     
+    
 
     # 個人資料與頭像
     path('profile/', views.profile, name='profile'),                       # 使用者個人資料頁
+    path('preferences/', views.user_preferences, name='user_preferences'),
 
     # 分類與篩選功能
-    path('location/<int:location_id>/', views.filter_by_location, name='filter_by_location'),  # 地點篩選
-    path('category/<int:category_id>/', views.filter_by_category, name='filter_by_category'),  # 分類篩選
+    path('category/<int:category_id>/', views.filter_by_category, name='filter_by_category'),
+    path('location_type/<str:location_type>/', views.filter_by_location_type, name='filter_by_location_type'),
 
      # 內容檢舉與審核
     path('report_post/<int:pk>/', views.report_post, name='report_post'),  # 檢舉貼文

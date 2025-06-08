@@ -4,24 +4,35 @@ from django.contrib.auth.models import User
 # 地點模型（城市、州名等）
 class Location(models.Model):
     name = models.CharField(max_length=100)
-
+    
     def __str__(self):
         return self.name
 
 # 分類模型（如：Beaches, Museums）
 class Category(models.Model):
+    LOCATION_TYPE_CHOICES = [
+        ('indoor', 'Indoor'),
+        ('outdoor', 'Outdoor'),
+    ]
+    
     name = models.CharField(max_length=100)
-
+    location_type = models.CharField(
+        max_length=10, 
+        choices=LOCATION_TYPE_CHOICES,
+        default='indoor'
+    )
+    
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.location_type})"
+    
 
 # 主要貼文模型
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)  
-    title = models.CharField(max_length=200)                    
-    content = models.TextField()                               
-    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)  
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)  
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
     address = models.CharField(max_length=255, blank=True)     
     created_at = models.DateTimeField(auto_now_add=True)       
     is_draft = models.BooleanField(default=False)
@@ -33,6 +44,7 @@ class Post(models.Model):
     is_approved = models.BooleanField(default=False)
     takedown_reason = models.CharField(max_length=255, blank=True, null=True)
     is_deleted = models.BooleanField(default=False, help_text="軟刪除：被刪除則不顯示於前台")
+    
 
     def __str__(self):
         return self.title
@@ -57,7 +69,9 @@ class Comment(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)  
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)  
-
+    interests = models.CharField(max_length=200, blank=True)
+    want_email_notifications = models.BooleanField(default=False)
+    
     def __str__(self):
         return self.user.username
 

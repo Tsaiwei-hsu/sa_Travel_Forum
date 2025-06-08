@@ -15,12 +15,21 @@ class City(models.Model):
     def __str__(self):
         return f"{self.name} ({self.state.name})"
 
-# 類別模型：如 Beaches、Parks 等景點分類
 class Category(models.Model):
-    name = models.CharField(max_length=100)  
-
+    LOCATION_TYPE_CHOICES = [
+        ('indoor', 'Indoor'),
+        ('outdoor', 'Outdoor'),
+    ]
+    
+    name = models.CharField(max_length=100)
+    location_type = models.CharField(
+        max_length=20,  # 使用較大的長度以防萬一
+        choices=LOCATION_TYPE_CHOICES,
+        default='indoor'
+    )
+    
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.location_type})"
 
 # 貼文模型：包含標題、內容、作者、時間等資訊
 class Post(models.Model):

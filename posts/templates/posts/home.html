@@ -2,8 +2,226 @@
 {% load static %}
 
 {% block content %}
-<h2>地圖首頁</h2>
-<div id="map" style="height: 500px; background: #e0e0e0; text-align: center; line-height: 500px;">
-    🌍 這裡是地圖區（可放 Leaflet）
+<div id="container">
+  <div id="map"></div>
 </div>
+
+<!-- ✅ Legend 移到 container 外（fixed 才不受 margin 限制） -->
+<div id="legend"></div>
+
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #f3f3f4 0%, #ede7fa 30%, #bcb4dd 100%);
+    background-attachment: fixed;
+    font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+    overflow: hidden;
+  }
+
+  #container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    margin: 20px auto 40px 250px;
+  }
+
+  #map {
+    width: 100%;
+    height: 100%;
+  }
+
+  .state {
+    stroke: #fff;
+    stroke-width: 1px;
+    cursor: pointer;
+    opacity: 0.95;
+    transition: fill 0.2s ease, stroke-width 0.2s ease;
+  }
+
+  .state:hover {
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.6));
+    fill: rgba(95, 94, 92, 0.4) !important;
+    stroke-width: 2px;
+  }
+
+  .state-tooltip text {
+    font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+    font-size: 14px;
+    fill: #444;
+    pointer-events: none;
+  }
+
+  .state-tooltip-title {
+    font-size: 15px;
+    font-weight: 700;
+    fill: #222;
+  }
+
+  .state-tooltip-bg {
+    fill: rgba(255, 255, 255, 0.88);
+    stroke: #ccc;
+    stroke-width: 1;
+    rx: 12;
+    ry: 12;
+    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.12));
+  }
+
+  /* ✅ 固定在右下角的 legend */
+  #legend {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 16px 18px;
+    border-radius: 14px;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ccc;
+    width: max-content;
+    z-index: 1000;
+  }
+
+  #legend > div:first-child {
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    gap: 8px;
+  }
+
+  .legend-color {
+    width: 16px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid #444;
+  }
+</style>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function(){
+  const stateCities = {
+    "1":[{name:"Sydney"},{name:"Newcastle"},{name:"Wollongong"}],
+    "2":[{name:"Melbourne"},{name:"Geelong"},{name:"Ballarat"}],
+    "3":[{name:"Brisbane"},{name:"Cairns"},{name:"Gold Coast"}],
+    "4":[{name:"Adelaide"},{name:"Mount Gambier"},{name:"Port Augusta"}],
+    "5":[{name:"Perth"},{name:"Fremantle"},{name:"Broome"}],
+    "6":[{name:"Hobart"},{name:"Launceston"}],
+    "7":[{name:"Darwin"},{name:"Alice Springs"}],
+    "8":[{name:"Canberra"}]
+  };
+  const stateNameMap = {
+    "1":"New South Wales","2":"Victoria","3":"Queensland","4":"South Australia",
+    "5":"Western Australia","6":"Tasmania","7":"Northern Territory","8":"Australian Capital Territory"
+  };
+  const stateColor = {
+    "1":"#7fb3ff","2":"#f293b6","3":"#ffe08a","4":"#a9d18e",
+    "5":"#b7a4ff","6":"#ffb480","7":"#81e3d6","8":"#ff9999"
+  };
+
+  const w = 960, h = 600;
+  const svg = d3.select("#map").append("svg").attr("width", w).attr("height", h);
+  const proj = d3.geoMercator().translate([w / 2 + 300, h / 2 - 50]);
+  const path = d3.geoPath().projection(proj);
+  const gAll = svg.append("g");
+  const gStates = gAll.append("g").attr("class", "states");
+
+  d3.json("{% static 'australia-states.geojson' %}").then(gs => {
+    proj.fitSize([w, h], gs);
+    gStates.selectAll("path").data(gs.features)
+      .join("path")
+        .attr("id", d => `state-${d.properties.STATE_CODE}`)
+        .attr("class", "state")
+        .attr("d", path)
+        .attr("fill", d => stateColor[d.properties.STATE_CODE])
+        .on("mouseover", function(event, d){
+          const code = d.properties.STATE_CODE;
+          const cities = stateCities[code] || [];
+          const title = stateNameMap[code];
+
+          const [mouseX, mouseY] = d3.pointer(event, svg.node());
+          const tooltipGroup = gStates.append("g").attr("class", "state-tooltip");
+
+          const tooltipText = tooltipGroup.append("text")
+            .attr("x", mouseX + 12)
+            .attr("y", mouseY + 12)
+            .attr("text-anchor", "start");
+
+          tooltipText.append("tspan")
+            .attr("class", "state-tooltip-title")
+            .attr("x", mouseX + 12)
+            .attr("dy", "1em")
+            .text(title);
+
+          cities.forEach((city, i) => {
+            tooltipText.append("tspan")
+              .attr("x", mouseX + 12)
+              .attr("dy", "1.4em")
+              .text(`📍 ${city.name}`);
+          });
+
+          setTimeout(() => {
+            const bbox = tooltipText.node().getBBox();
+            let x = bbox.x - 8;
+            let y = bbox.y - 6;
+            let width = bbox.width + 16;
+            let height = bbox.height + 12;
+
+            const overflowRight = x + width > w;
+            const overflowBottom = y + height > h;
+            const adjustedX = overflowRight ? mouseX - width - 12 : mouseX + 12;
+            const adjustedY = overflowBottom ? mouseY - height - 12 : mouseY + 12;
+
+            tooltipText.selectAll("tspan")
+              .attr("x", adjustedX);
+            tooltipText.attr("x", adjustedX).attr("y", adjustedY);
+
+            const finalBox = tooltipText.node().getBBox();
+            tooltipGroup.insert("rect", "text")
+              .attr("class", "state-tooltip-bg")
+              .attr("x", finalBox.x - 8)
+              .attr("y", finalBox.y - 6)
+              .attr("width", finalBox.width + 16)
+              .attr("height", finalBox.height + 12)
+              .attr("rx", 10)
+              .attr("ry", 10)
+              .attr("pointer-events", "none");
+          }, 0);
+        })
+        .on("mouseout", function(event, d){
+          const code = d.properties.STATE_CODE;
+          d3.select(this).attr("fill", stateColor[code]).attr("stroke-width", 1);
+          gStates.selectAll(".state-tooltip").remove();
+        })
+        .on("click", function(event, d){
+          const code = d.properties.STATE_CODE;
+          window.location.href = `/state/${code}/`;
+        });
+
+    // ✅ 建立 legend 內容
+    const legend = d3.select("#legend");
+    legend.append("div").text("州 ‑ 顏色圖例");
+    Object.entries(stateNameMap).forEach(([code, name]) => {
+      const item = legend.append("div").attr("class", "legend-item");
+      item.append("div").attr("class", "legend-color").style("background-color", stateColor[code]);
+      item.append("div").text(name);
+    });
+  });
+
+  svg.call(d3.zoom().scaleExtent([1, 8])
+    .on("zoom", ({ transform }) => gAll.attr("transform", transform))
+  );
+
+  svg.on("wheel.zoom", null);
+  svg.on("dblclick.zoom", null);
+})();
+</script>
 {% endblock %}

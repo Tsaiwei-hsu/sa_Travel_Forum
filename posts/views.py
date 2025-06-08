@@ -16,7 +16,6 @@ from django import forms
 import os
 from django.utils import timezone
 
-
 from .forms import (
     CustomUserCreationForm, CommentForm, PostForm, PhotoForm, UserProfileForm, ReportForm
 )
@@ -42,7 +41,7 @@ def signup(request):
             user.email = form.cleaned_data['email']
             user.save()
             login(request, user)
-            return redirect('home')
+            return redirect('user_preferences')
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
@@ -67,10 +66,27 @@ def profile(request):
         user_form = ProfileForm(instance=request.user)
         profile_form = UserProfileForm(instance=user_profile)
 
-    my_posts = request.user.post_set.filter(is_draft=False).order_by('-created_at')
-    user_drafts = request.user.post_set.filter(is_draft=True, is_deleted=False).order_by('-created_at') 
-    my_favorites = Favorite.objects.filter(user=request.user, post__is_deleted=False).select_related('post')
     deleted_posts = request.user.post_set.filter(is_deleted=True).order_by('-created_at')
+
+    # 只顯示未刪除、已發佈的貼文
+    my_posts = request.user.post_set.filter(
+        is_draft=False,
+        is_deleted=False
+    ).order_by('-created_at')
+
+    # 收藏 already filtered by post__is_deleted=False?
+    my_favorites = Favorite.objects.filter(
+        user=request.user,
+        post__is_deleted=False
+    ).select_related('post')
+
+    # 草稿、已刪除等維持原樣
+    user_drafts = request.user.post_set.filter(
+        is_draft=True, is_deleted=False
+    ).order_by('-created_at')
+    deleted_posts = request.user.post_set.filter(
+        is_deleted=True
+    ).order_by('-created_at')
 
     return render(request, 'posts/profile.html', {
         'section': section,
@@ -85,53 +101,48 @@ def profile(request):
 # 建立貼文（多圖）
 @login_required
 def create_post(request):
-    if request.method == 'POST':
-        if 'cancel' in request.POST:
-            return redirect('post_list')
+    if request.method == 'POST' and 'cancel' in request.POST:
+        return redirect('post_list')
 
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        # 儲存草稿
         if 'save_draft' in request.POST:
-            # 草稿允許空欄位，但至少要填一個欄位
-            title = request.POST.get('title', '').strip()
-            content = request.POST.get('content', '').strip()
-            location = request.POST.get('location')
-            category = request.POST.get('category')
-            address = request.POST.get('address', '').strip()
-            rate_posta = request.POST.get('rate_posta')
-            if not (title or content or location or category or address):
-                messages.error(request, "請至少填寫一個欄位再儲存草稿！")
-                form = PostForm(request.POST)
-                return render(request, 'posts/create_post.html', {
-                    'form': form,
-                    'locations': Location.objects.all(),
-                    'categories': Category.objects.all(),
-                })
-            post = Post(author=request.user, is_draft=True)
-            post.title = title
-            post.content = content
-            post.location_id = location or None
-            post.category_id = category or None
-            post.address = address
-            post.rate_posta = float(rate_posta) if rate_posta else None
-            post.save()
-            for img in request.FILES.getlist('images'):
-                Photo.objects.create(post=post, image=img)
-            messages.success(request, "草稿已儲存！")
-            return redirect('/profile/?section=drafts')
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                post.is_draft = True
+                post.save()
+                for img in request.FILES.getlist('images'):
+                    Photo.objects.create(post=post, image=img)
+                messages.success(request, "草稿已儲存！")
+                return redirect('/profile/?section=drafts')
+            else:
+                # 檢查是否為違規詞錯誤
+                violation_msgs = [e for errs in form.errors.values() for e in errs if '違規詞' in str(e)]
+                if violation_msgs:
+                    for msg in violation_msgs:
+                        messages.error(request, msg)
+                else:
+                    messages.error(request, "草稿儲存失敗，請檢查輸入。")
+        # 發佈貼文
         else:
-            form = PostForm(request.POST)
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = request.user
                 post.is_draft = False
-                rate_posta = request.POST.get('rate_posta')
-                post.rate_posta = float(rate_posta) if rate_posta else None
                 post.save()
                 for img in request.FILES.getlist('images'):
                     Photo.objects.create(post=post, image=img)
                 messages.success(request, "貼文已發佈！")
                 return redirect('post_list')
             else:
-                messages.error(request, "表單錯誤，請確認欄位")
+                violation_msgs = [e for errs in form.errors.values() for e in errs if '違規詞' in str(e)]
+                if violation_msgs:
+                    for msg in violation_msgs:
+                        messages.error(request, msg)
+                else:
+                    messages.error(request, "發布失敗，請確認表單輸入是否正確。")
     else:
         form = PostForm()
 
@@ -230,10 +241,10 @@ def delete_post(request, pk):
         post.is_deleted = True
         post.save()
         if post.is_draft:
-            messages.success(request, "草稿已刪除（僅自己可見）")
+            messages.success(request, "草稿已刪除")
             return redirect('/profile/?section=drafts')
         else:
-            messages.success(request, "貼文已刪除（僅自己可見）")
+            messages.success(request, "貼文已刪除")
             return redirect('/profile/?section=posts')
     else:
         messages.error(request, "刪除失敗：必須透過 POST 請求")
@@ -278,23 +289,54 @@ def post_detail(request, pk):
         'avg_comment_rating': avg_comment_rating,
     })
 
-# 貼文列表
-def post_list(request):
-    location_name = request.GET.get('location')
-    posts = Post.objects.filter(is_draft=False, is_deleted=False).order_by('-created_at')
-    if location_name:
-        location = get_object_or_404(Location, name=location_name)
-        posts = posts.filter(location=location)
+# 貼文列表 - 主要整合篩選功能
+from django.shortcuts import render, get_object_or_404
+from .models import Location, Category, Post, Favorite
 
-    user_favorites = Favorite.objects.filter(user=request.user, post__is_deleted=False).values_list('post_id', flat=True) if request.user.is_authenticated else []
+def post_list(request):
+    # 讀取參數
+    selected_location = request.GET.get('location', '')
+    selected_type = request.GET.get('location_type', '')  # 'indoor' 或 'outdoor'
+    selected_category_id = request.GET.get('category', '')
+
+    # 基礎 queryset
+    posts = Post.objects.filter(is_draft=False, is_deleted=False).order_by('-created_at')
+
+    # 地點過濾
+    if selected_location:
+        posts = posts.filter(location__name=selected_location)
+
+    # 類型過濾 (Indoor/Outdoor)
+    if selected_type in ['indoor', 'outdoor']:
+        posts = posts.filter(category__location_type=selected_type)
+
+    # 分類過濾
+    current_category = None
+    if selected_category_id:
+        posts = posts.filter(category_id=selected_category_id)
+        current_category = get_object_or_404(Category, pk=selected_category_id).name
+
+    # 取得選單資料
+    locations = Location.objects.all()
+    indoor_categories = Category.objects.filter(location_type='indoor')
+    outdoor_categories = Category.objects.filter(location_type='outdoor')
+
+    # 使用者收藏
+    user_favorites = []
+    if request.user.is_authenticated:
+        user_favorites = Favorite.objects.filter(user=request.user, post__is_deleted=False).values_list('post_id', flat=True)
 
     return render(request, 'posts/post_list.html', {
         'posts': posts,
-        'locations': Location.objects.all(),
-        'categories': Category.objects.all(),
-        'selected_location': location_name,
+        'locations': locations,
+        'indoor_categories': indoor_categories,
+        'outdoor_categories': outdoor_categories,
+        'selected_location': selected_location,
+        'selected_type': selected_type,
+        'current_category': current_category,
         'user_favorites': user_favorites,
     })
+
 
 # 收藏切換
 @login_required
@@ -306,26 +348,49 @@ def toggle_favorite(request, post_id):
         return JsonResponse({'status': 'unfavorited'})
     return JsonResponse({'status': 'favorited'})
 
-# 過濾：地點與分類
-def filter_by_location(request, location_name):
-    return HttpResponseRedirect(f"{reverse('post_list')}?location={location_name}")
-
+# 過濾：地點
 def filter_by_category(request, category_id):
-    category = get_object_or_404(Category, pk=category_id)
+    params = request.GET.copy()
+    params['category'] = category_id
+    url = reverse('post_list') + '?' + params.urlencode()
+    return redirect(url)
+
+
+def filter_by_location_type(request, location_type):
+    params = request.GET.copy()
+    params['location_type'] = location_type
+    url = reverse('post_list') + '?' + params.urlencode()
+    return redirect(url)
+
+
+# 過濾：位置類型 (Indoor/Outdoor) - 可以刪除這個函數，因為功能已整合到 post_list
+def filter_by_location_type(request, location_type):
     location_name = request.GET.get('location')
-    posts = Post.objects.filter(category=category).order_by('-created_at')
+    posts = Post.objects.filter(
+        is_draft=False, 
+        is_deleted=False,
+        category__location_type=location_type
+    ).order_by('-created_at')
+    
     if location_name:
         location = get_object_or_404(Location, name=location_name)
         posts = posts.filter(location=location)
 
-    user_favorites = Favorite.objects.filter(user=request.user).values_list('post_id', flat=True) if request.user.is_authenticated else []
+    user_favorites = Favorite.objects.filter(user=request.user, post__is_deleted=False).values_list('post_id', flat=True) if request.user.is_authenticated else []
+
+    # 取得所有分類資料，分別傳給模板
+    indoor_categories = Category.objects.filter(location_type='indoor')
+    outdoor_categories = Category.objects.filter(location_type='outdoor')
 
     return render(request, 'posts/post_list.html', {
         'posts': posts,
         'locations': Location.objects.all(),
         'categories': Category.objects.all(),
+        'indoor_categories': indoor_categories,
+        'outdoor_categories': outdoor_categories,
         'selected_location': location_name,
-        'current_category': category.name,
+        'selected_location_type': location_type,
+        'current_location_type': location_type.title(),
         'user_favorites': user_favorites,
     })
 
@@ -340,7 +405,7 @@ def delete_comment(request, comment_id):
     messages.success(request, "留言已刪除")
     return redirect('post_detail', pk=post_id)
 
-
+# 修改密碼
 class MyPasswordChangeView(PasswordChangeView):
     template_name = 'registration/change_password.html'  
     success_url = reverse_lazy('profile')  
@@ -349,7 +414,7 @@ class MyPasswordChangeView(PasswordChangeView):
         messages.success(self.request, '密碼已成功修改')
         return super().form_valid(form)
     
- # 檢舉貼文
+# 檢舉貼文
 @login_required
 def report_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
@@ -384,3 +449,26 @@ def manual_review_action(request, pk, action):
     post.manual_reviewed = True
     post.save()
     return redirect('manual_review_list')
+
+from .forms import PreferencesForm
+
+@login_required
+def user_preferences(request):
+    # 只有在剛註冊或強制填寫時導向到這裡
+    if request.method == 'POST':
+        form = PreferencesForm(request.POST)
+        if form.is_valid():
+            # 這裡你可以把偏好存到 UserProfile 或另一張表
+            profile = UserProfile.objects.get(user=request.user)
+            profile.interests = form.cleaned_data['interests']
+            profile.want_email_notifications = form.cleaned_data['want_email_notifications']
+            profile.save()
+            return redirect('home')  # 或任何你想導去的頁面
+    else:
+        # 預填：從 profile 拿已有資料
+        profile = UserProfile.objects.get_or_create(user=request.user)[0]
+        form = PreferencesForm(initial={
+            'interests': profile.interests or '',
+            'want_email_notifications': profile.want_email_notifications,
+        })
+    return render(request, 'posts/preferences.html', {'form': form})

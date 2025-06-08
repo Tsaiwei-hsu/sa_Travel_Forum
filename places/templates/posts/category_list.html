@@ -76,25 +76,26 @@
 
   <!-- 顯示熱門類型 -->
   <div class="category-list">
-    {% for category in categories %}
-      {% if category.name in "Beaches Museums Parks Historical" %}
-        <a href="{% url 'filter_by_category' category.id %}?location={{ location.id }}"
-           class="{% if current_category == category.name %}active{% endif %}">{{ category.name }}</a>
-      {% endif %}
-    {% endfor %}
-
-    <!-- 隱藏的更多類型 -->
-    <div id="more-categories">
-      {% for category in categories %}
-        {% if category.name not in "Beaches Museums Parks Historical" %}
-          <a href="{% url 'filter_by_category' category.id %}?location={{ location.id }}"
-             class="{% if current_category == category.name %}active{% endif %}">{{ category.name }}</a>
-        {% endif %}
-      {% endfor %}
+    <div style="font-weight:bold;margin-bottom:8px;">Indoor
+      <button id="toggle-indoor" class="toggle-btn" style="margin-left:10px;">展開 ▼</button>
     </div>
-
-    <!-- 更多類型按鈕 -->
-    <button id="toggle-more" class="toggle-btn">更多類型 ▼</button>
+    <div id="indoor-categories" style="display:none;">
+      <a href="{% url 'filter_by_category' 1 %}?location={{ location.id }}" class="{% if current_category_id == 1 %}active{% endif %}">Restaurants / Cafés</a>
+      <a href="{% url 'filter_by_category' 2 %}?location={{ location.id }}" class="{% if current_category_id == 2 %}active{% endif %}">Museums / Art Galleries</a>
+      <a href="{% url 'filter_by_category' 3 %}?location={{ location.id }}" class="{% if current_category_id == 3 %}active{% endif %}">Gyms / Fitness Studios</a>
+      <a href="{% url 'filter_by_category' 4 %}?location={{ location.id }}" class="{% if current_category_id == 4 %}active{% endif %}">Shopping Malls</a>
+      <a href="{% url 'filter_by_category' 5 %}?location={{ location.id }}" class="{% if current_category_id == 5 %}active{% endif %}">Cinemas / Theaters</a>
+    </div>
+    <div style="font-weight:bold;margin:24px 0 8px 0;">Outdoor
+      <button id="toggle-outdoor" class="toggle-btn" style="margin-left:10px;">展開 ▼</button>
+    </div>
+    <div id="outdoor-categories" style="display:none;">
+      <a href="{% url 'filter_by_category' 6 %}?location={{ location.id }}" class="{% if current_category_id == 6 %}active{% endif %}">Parks / Gardens</a>
+      <a href="{% url 'filter_by_category' 7 %}?location={{ location.id }}" class="{% if current_category_id == 7 %}active{% endif %}">Beaches / Lakesides</a>
+      <a href="{% url 'filter_by_category' 8 %}?location={{ location.id }}" class="{% if current_category_id == 8 %}active{% endif %}">Outdoor Markets / Street Fairs</a>
+      <a href="{% url 'filter_by_category' 9 %}?location={{ location.id }}" class="{% if current_category_id == 9 %}active{% endif %}">Stadiums / Sports Fields</a>
+      <a href="{% url 'filter_by_category' 10 %}?location={{ location.id }}" class="{% if current_category_id == 10 %}active{% endif %}">Hiking Trails / Nature Reserves</a>
+    </div>
   </div>
 
   <!-- 回首頁按鈕 -->
@@ -103,14 +104,24 @@
 
 <!-- 切換展開更多類型的 JavaScript -->
 <script>
-  const toggleBtn = document.getElementById('toggle-more');
-  const moreBlock = document.getElementById('more-categories');
-  let expanded = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    const indoorBtn = document.getElementById('toggle-indoor');
+    const outdoorBtn = document.getElementById('toggle-outdoor');
+    const indoorBlock = document.getElementById('indoor-categories');
+    const outdoorBlock = document.getElementById('outdoor-categories');
+    let indoorOpen = false, outdoorOpen = false;
 
-  toggleBtn.addEventListener('click', () => {
-    expanded = !expanded;
-    moreBlock.style.display = expanded ? 'block' : 'none';
-    toggleBtn.textContent = expanded ? '收起 ▲' : '更多類型 ▼';
+    indoorBtn.onclick = function() {
+      indoorOpen = !indoorOpen;
+      indoorBlock.style.display = indoorOpen ? 'block' : 'none';
+      indoorBtn.textContent = indoorOpen ? '收起 ▲' : '展開 ▼';
+    };
+
+    outdoorBtn.onclick = function() {
+      outdoorOpen = !outdoorOpen;
+      outdoorBlock.style.display = outdoorOpen ? 'block' : 'none';
+      outdoorBtn.textContent = outdoorOpen ? '收起 ▲' : '展開 ▼';
+    };
   });
 </script>
 {% endblock %}
