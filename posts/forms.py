@@ -31,11 +31,21 @@ class PostForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # 除了 rate_posta 與 images，欄位皆為必填
+
+        # 除了 rate_posta 與 images，其餘皆為必填
         for name, field in self.fields.items():
             if name not in ['rate_posta', 'images']:
                 field.required = True
         self.fields['rate_posta'].required = False
+
+        # ✅ 保證 category 一定包含原本的值（避免編輯時出錯）
+        original_category = self.instance.category if self.instance and self.instance.pk else None
+        categories = Category.objects.all()
+
+        if original_category and original_category not in categories:
+            categories = Category.objects.filter(pk=original_category.pk) | categories
+
+        self.fields['category'].queryset = categories.distinct()
 
     def clean(self):
         cleaned = super().clean()

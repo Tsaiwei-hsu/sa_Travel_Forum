@@ -181,19 +181,16 @@
         {{ form.location.errors }}
       
         <!-- 分類下拉 -->
-        <select name="category" class="input-box">
+        <select name="category" class="input-box{% if form.category.errors %} error{% endif %}">
           <option value="">選擇分類</option>
-          <option value="1" {% if form.category.value|stringformat:"s" == '1' %}selected{% endif %}>Restaurants / Cafés</option>
-          <option value="2" {% if form.category.value|stringformat:"s" == '2' %}selected{% endif %}>Museums / Art Galleries</option>
-          <option value="3" {% if form.category.value|stringformat:"s" == '3' %}selected{% endif %}>Gyms / Fitness Studios</option>
-          <option value="4" {% if form.category.value|stringformat:"s" == '4' %}selected{% endif %}>Shopping Malls</option>
-          <option value="5" {% if form.category.value|stringformat:"s" == '5' %}selected{% endif %}>Cinemas / Theaters</option>
-          <option value="6" {% if form.category.value|stringformat:"s" == '6' %}selected{% endif %}>Parks / Gardens</option>
-          <option value="7" {% if form.category.value|stringformat:"s" == '7' %}selected{% endif %}>Beaches / Lakesides</option>
-          <option value="8" {% if form.category.value|stringformat:"s" == '8' %}selected{% endif %}>Outdoor Markets / Street Fairs</option>
-          <option value="9" {% if form.category.value|stringformat:"s" == '9' %}selected{% endif %}>Stadiums / Sports Fields</option>
-          <option value="10" {% if form.category.value|stringformat:"s" == '10' %}selected{% endif %}>Hiking Trails / Nature Reserves</option>
+          {% for cat in form.fields.category.queryset %}
+            <option value="{{ cat.id }}"
+                    {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>
+              {{ cat.name }}
+            </option>
+          {% endfor %}
         </select>
+
         {{ form.category.errors }}
       
         <!-- 地址 -->

@@ -293,35 +293,35 @@ def post_detail(request, pk):
 from django.shortcuts import render, get_object_or_404
 from .models import Location, Category, Post, Favorite
 
+from django.shortcuts import render, get_object_or_404
+from .models import Post, Location, Category, Favorite
+
 def post_list(request):
-    # 讀取參數
     selected_location = request.GET.get('location', '')
-    selected_type = request.GET.get('location_type', '')  # 'indoor' 或 'outdoor'
+    selected_type = request.GET.get('location_type', '')
     selected_category_id = request.GET.get('category', '')
 
-    # 基礎 queryset
     posts = Post.objects.filter(is_draft=False, is_deleted=False).order_by('-created_at')
 
-    # 地點過濾
     if selected_location:
         posts = posts.filter(location__name=selected_location)
 
-    # 類型過濾 (Indoor/Outdoor)
     if selected_type in ['indoor', 'outdoor']:
         posts = posts.filter(category__location_type=selected_type)
 
-    # 分類過濾
     current_category = None
     if selected_category_id:
-        posts = posts.filter(category_id=selected_category_id)
-        current_category = get_object_or_404(Category, pk=selected_category_id).name
+        try:
+            category = Category.objects.get(pk=selected_category_id)
+            posts = posts.filter(category=category)
+            current_category = category.name
+        except Category.DoesNotExist:
+            current_category = None
 
-    # 取得選單資料
     locations = Location.objects.all()
     indoor_categories = Category.objects.filter(location_type='indoor')
     outdoor_categories = Category.objects.filter(location_type='outdoor')
 
-    # 使用者收藏
     user_favorites = []
     if request.user.is_authenticated:
         user_favorites = Favorite.objects.filter(user=request.user, post__is_deleted=False).values_list('post_id', flat=True)
@@ -336,6 +336,7 @@ def post_list(request):
         'current_category': current_category,
         'user_favorites': user_favorites,
     })
+
 
 
 # 收藏切換
@@ -468,7 +469,7 @@ def user_preferences(request):
         if form.is_valid():
             form.save()
             messages.success(request, "偏好已儲存")
-            return redirect('home')  # 儲存完導向首頁或任意頁面
+            return redirect('post_list') # 儲存完導向首頁或任意頁面
     else:
         form = PreferencesForm(instance=pref)
 
