@@ -2,6 +2,9 @@ from django import forms
 from .models import Post, Comment, UserProfile, Photo
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django import forms
+from .models import UserPreference, Location, Category
+
 
 # 違規詞列表，可擴充
 BAD_WORDS = ['血腥', '暴力', '色情', '殺', '強姦', '裸', '屍體']
@@ -107,8 +110,52 @@ class PhotoForm(forms.ModelForm):
 class ReportForm(forms.Form):
     reason = forms.CharField(label="檢舉理由", max_length=255, widget=forms.Textarea)
 
+# posts/forms.py
+from django import forms
+from .models import UserPreference, Location, Category
 
-class PreferencesForm(forms.Form):
-    # 根據你的需求定義欄位，示例用興趣與通知開關
-    interests = forms.CharField(label="興趣（逗號分隔）", max_length=200)
-    want_email_notifications = forms.BooleanField(label="希望接收電子郵件通知", required=False)
+from django import forms
+from .models import UserPreference, Category, Location
+
+class PreferencesForm(forms.ModelForm):
+    favorite_locations = forms.ModelMultipleChoiceField(
+        queryset=Location.objects.all(),
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select',
+            'multiple': 'multiple',
+            'size': 5,
+        }),
+        label='喜歡的城市',
+        required=False,
+    )
+
+    indoor_categories = forms.ModelMultipleChoiceField(
+        queryset=Category.objects.none(),
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select',
+            'multiple': 'multiple',
+            'size': 5,
+        }),
+        label='喜歡的室內分類',
+        required=False,
+    )
+
+    outdoor_categories = forms.ModelMultipleChoiceField(
+        queryset=Category.objects.none(),
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select',
+            'multiple': 'multiple',
+            'size': 5,
+        }),
+        label='喜歡的室外分類',
+        required=False,
+    )
+
+    class Meta:
+        model = UserPreference
+        fields = ['favorite_locations', 'indoor_categories', 'outdoor_categories']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['indoor_categories'].queryset = Category.objects.filter(location_type='indoor')
+        self.fields['outdoor_categories'].queryset = Category.objects.filter(location_type='outdoor')

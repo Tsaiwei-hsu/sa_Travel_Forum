@@ -450,25 +450,31 @@ def manual_review_action(request, pk, action):
     post.save()
     return redirect('manual_review_list')
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import UserPreference
 from .forms import PreferencesForm
 
 @login_required
 def user_preferences(request):
     # 只有在剛註冊或強制填寫時導向到這裡
+    pref, _ = UserPreference.objects.get_or_create(user=request.user)
+    indoor_cats  = Category.objects.filter(location_type='indoor')
+    outdoor_cats = Category.objects.filter(location_type='outdoor')
+
     if request.method == 'POST':
-        form = PreferencesForm(request.POST)
+        # 直接用 instance 讓 ModelForm 處理 M2M 存取
+        form = PreferencesForm(request.POST, instance=pref)
         if form.is_valid():
-            # 這裡你可以把偏好存到 UserProfile 或另一張表
-            profile = UserProfile.objects.get(user=request.user)
-            profile.interests = form.cleaned_data['interests']
-            profile.want_email_notifications = form.cleaned_data['want_email_notifications']
-            profile.save()
-            return redirect('home')  # 或任何你想導去的頁面
+            form.save()
+            messages.success(request, "偏好已儲存")
+            return redirect('home')  # 儲存完導向首頁或任意頁面
     else:
-        # 預填：從 profile 拿已有資料
-        profile = UserProfile.objects.get_or_create(user=request.user)[0]
-        form = PreferencesForm(initial={
-            'interests': profile.interests or '',
-            'want_email_notifications': profile.want_email_notifications,
-        })
-    return render(request, 'posts/preferences.html', {'form': form})
+        form = PreferencesForm(instance=pref)
+
+    
+    return render(request, 'posts/preferences.html', {
+        'form': form,
+        'indoor_cats': indoor_cats,
+        'outdoor_cats': outdoor_cats,
+    })

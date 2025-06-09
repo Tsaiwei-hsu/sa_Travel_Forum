@@ -1,38 +1,40 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# 地點模型（城市、州名等）
+# 城市模型
 class Location(models.Model):
-    name = models.CharField(max_length=100)
-    
+    name = models.CharField("城市名稱", max_length=100)
     def __str__(self):
         return self.name
 
-# 分類模型（如：Beaches, Museums）
+# 室內 / 戶外 分類模型（10 筆預先建立）
 class Category(models.Model):
     LOCATION_TYPE_CHOICES = [
         ('indoor', 'Indoor'),
         ('outdoor', 'Outdoor'),
     ]
-    
-    name = models.CharField(max_length=100)
+    name = models.CharField("分類名稱", max_length=100)
     location_type = models.CharField(
-        max_length=10, 
+        "環境類型",
+        max_length=10,
         choices=LOCATION_TYPE_CHOICES,
-        default='indoor'
+        default='indoor',
     )
-    
     def __str__(self):
-        return f"{self.name} ({self.location_type})"
-    
+        return f"{self.name} ({self.get_location_type_display()})"
 
 # 主要貼文模型
 class Post(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)  
-    title = models.CharField(max_length=200)
-    content = models.TextField()
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
+    author   = models.ForeignKey(User, on_delete=models.CASCADE)
+    title    = models.CharField(max_length=200)
+    content  = models.TextField()
+    location = models.ForeignKey(
+        Location, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
     address = models.CharField(max_length=255, blank=True)     
     created_at = models.DateTimeField(auto_now_add=True)       
     is_draft = models.BooleanField(default=False)
@@ -75,7 +77,7 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
-# models.py
+# 收藏
 class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -83,12 +85,11 @@ class Favorite(models.Model):
 
     class Meta:
         unique_together = ('user', 'post')  # 防止重複收藏
+    
 
-# 使用者喜好
 class UserPreference(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    favorite_categories = models.ManyToManyField(Category, blank=True)  # 使用者喜好的分類
-    favorite_locations = models.ManyToManyField(Location, blank=True)  # 使用者喜好的地點
-
+    user                = models.OneToOneField(User, on_delete=models.CASCADE)
+    favorite_locations  = models.ManyToManyField(Location, blank=True, verbose_name="喜歡的城市")
+    favorite_categories = models.ManyToManyField(Category, blank=True, verbose_name="喜歡的環境分類")
     def __str__(self):
-        return f"{self.user.username}的喜好"
+        return f"{self.user.username} 的喜好"
